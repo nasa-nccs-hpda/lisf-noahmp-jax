@@ -1,11 +1,11 @@
 # Roadmap at a glance (running; newest work first)
 
-Last updated: 2026-11-03 17:30. Owner: G. Tamkin. Everything below is work from 2026-11-02 onward; earlier history is in `LOG.md`, `STATUS_20261022.md`, `Reports/BENCHMARKS.md`.
+Last updated: 2026-11-03 (three-way speed table added). Owner: G. Tamkin. Everything below is work from 2026-11-02 onward; earlier history is in `LOG.md`, `STATUS_20261022.md`, `Reports/BENCHMARKS.md`.
 
 ## Status board
 | # | Workstream | Status | Next step | Where |
 |---|---|---|---|---|
-| 1 | MPI baseline (fair speed comparison) | RUNNING | Scaling job 37950488 on gpu016 (40 cores): 5 days at 4/8/16/32/40/1 ranks; then full 60 days at the best count; report vs JAX | `lisf_run/conus_mp5_mpi/`, `gpu/gpu_conus_mp5_mpi_scaling.sbatch` |
+| 1 | MPI baseline (fair speed comparison) | DONE | 60 d: serial 1 core 43,900 s; MPI 40 cores 2,207 s; JAX 1 V100 255 s. JAX is 172x vs 1 core, **8.7x vs 40 cores**. Customer told 172x on 2026-11-03: send the clarification | `lisf_run/conus_mp5_mpi/`, `gpu/gpu_conus_mp5_mpi_scaling.sbatch` |
 | 2 | Max differences for the client | DONE (table below) | Add a tile map of where the maxima sit, if asked | `Reports/cmp_conus_mp5_60d_fix1_20261025.txt` |
 | 3 | Teammate's "not believable" concern | REPLY DRAFTED | Send reply; run item 1; get an independent reproduction; reword claims | this file |
 | 4 | NCAR/noahmp 5.2.1 (fixes that change results first) | STARTED | Add dump hook to the 5.2.1 build, replay, port the default-path fixes | `projects/LISF/noahmp-ncar-jax/PLAN.md`, `dev/lisf_build_552/` |
@@ -16,7 +16,15 @@ Last updated: 2026-11-03 17:30. Owner: G. Tamkin. Everything below is work from 
 ## 1. MPI baseline
 - Why: the 172x compares one V100 with one serial Fortran core. Real LIS runs on many cores; a fair claim is "N times faster than N cores".
 - Plan: MPICH (GNU 14) -> ESMF with MPICH -> MPI copy of LIS -> run 5.0 CONUS, 5 days at several core counts on the same Xeon node type -> full 60 days at the best count -> report time and speed-up vs JAX.
-- Expect the headline ratio to fall. That is the point.
+- Expect the headline ratio to fall. That is the point. It fell from 172x to 8.7x.
+
+| Run (Noah-MP 5.0 CONUS, 60 d) | Hardware | Wall time | JAX speed-up |
+|---|---|---|---|
+| Fortran, serial | 1 core | ~43,900 s (12.2 h) | 172x |
+| Fortran, MPI | 40 cores, 1 node | 2,207 s (36.8 min) | **8.7x** |
+| JAX | 1 V100 | 255 s | 1x |
+
+MPI scaling, 5 days: 1 rank 55:31, 40 ranks 2:52 (19.4x), flattening above ~32 ranks. Details: `Reports/BENCHMARKS.md` (last section).
 - Status 16:20: MPICH, ESMF-MPI and the MPI copy of LIS (`dev/lisf_build_mpi`, pinned 5.0, clean driver, `-DSPMD`) are built (first compile failed for lack of `-DSPMD`; fixed, rebuilt 14:44). Scaling job 37950488 started 16:16 on a 40-core Xeon Gold 6248 node (same type as the serial and JAX runs); first run (4 ranks) is in progress. Results go here and in `Reports/BENCHMARKS.md`.
 
 ## 2. Max differences, 5.0 CONUS 60 d, JAX vs real LIS (240 history files)
@@ -32,7 +40,7 @@ The maxima are single tiles at snow / freeze-thaw switches (float32 amplificatio
 
 ## 3. Credibility of the speed numbers
 - Fair points: one GPU vs one serial core; only one person has run it; best numbers are the long cases (range 2.4x to 172x).
-- Safe wording for now: "up to about 170x vs one CPU core on one 60-day CONUS case; comparison with parallel LIS in progress."
+- Safe wording: "172x vs one CPU core and 8.7x vs a 40-core MPI run, one 60-day CONUS case, one V100." Always quote both.
 - Actions: item 1; ask the teammate or owner's side to reproduce the 60-day run and test suite (48 tests).
 
 ## 4. NCAR/noahmp 5.2.1

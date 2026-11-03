@@ -29,7 +29,7 @@ The two-day CONUS runs (Fortran LIS vs Python/JAX on CPU) agree as described in 
 
 ## Limits of these numbers
 - One domain, one model configuration, one day; the GPU/Fortran ratio depends on the tile count (it grows with it) and on the I/O share.
-- The Fortran run is serial; a parallel LIS (MPI) was not built because no working MPI runtime was available (see `LOG.md`). The ratio against a 12- or 64-core MPI LIS would be smaller.
+- The Fortran run in these 1-day tables is serial. An MPI LIS was built later (2026-11-03); for the 5.0 CONUS 60-day case the ratio against 40 MPI cores is 8.7x, see the three-way table at the end of this file.
 - Wall time includes file I/O on shared storage and is therefore somewhat noisy; each configuration was run once.
 
 ---
@@ -203,3 +203,14 @@ Agreement excluding the 148 tiles (p99 / max):
 So April-May melt-out agrees at p99 as well as the winter months; maxima are single tiles (one May snow tile differs by 151 mm). Limits: Fortran state identical to JAX at each segment start by construction; June covered only 5 days; the one-ulp tile check was not repeated for this run; the water-soil-type tiles should be treated as invalid in both models (an input-data problem of the LDT soil map, not a physics result).
 
 **Noah-MP 5.0 CONUS steady state (from the 60-day JAX run of job 37946640, 240 chunks, `jax_fix1.out`).** Device time per 6 h chunk after the first (compile) chunk: median 0.080 s = 0.32 s per simulated day (first chunk 87.3 s). Per simulated day: forcing reads on the host 2.31 s (138.9 s / 60 d), device 0.32 s, output 0.08 s; total about **2.7 s per day** once compiled, against 732 s per day for the serial Fortran = **about 270x steady state** (the wall-clock ratio of the 60-day run is 172x because 87 s of compile and 2 s of setup are included). The forcing reads (NLDAS-2 netCDF on the host, 8 processes) are 85% of the steady-state time, so the GPU is not the limit. Caveat: one V100 node with 8 cores for the readers; Fortran is one core of the same node type, not MPI LIS.
+
+## Speed, three-way comparison: Noah-MP 5.0, CONUS 0.125 deg (76,180 tiles), 60 simulated days (added 2026-11-03)
+Same domain, forcing and physics. Fortran = real LIS 7.8, GNU 14.2 -O2. MPI = MPICH 4 + ESMF (mpich), one 40-core Xeon Gold 6248 node.
+| Run | Hardware | Wall time (60 d) | Speed-up of JAX over it |
+|---|---|---|---|
+| Fortran LIS, serial | 1 CPU core | about 43,900 s (12.2 h; 732 s per simulated day, measured) | **172x** |
+| Fortran LIS, MPI | 40 CPU cores (one node) | 2,207 s (36.8 min; job 37950501, `lisf_run/conus_mp5_mpi/lis.60d_n40.time`) | **8.7x** |
+| JAX | 1 V100 GPU | 255 s (includes about 90 s compile; steady state 2.7 s per simulated day) | 1x |
+
+MPI scaling (5-day case, same binary): 1 rank 3,331 s (55:31); 40 ranks 172 s (2:52); 19.4x faster than 1 rank, flattening above about 32 ranks (earlier 4/8/16/32 rank points in `lisf_run/conus_mp5_mpi/lis.n*.time`).
+How to read it: **172x is the speed-up against one core. The fair comparison for an operational run on one node is 8.7x against 40 cores.** The ratio against a larger MPI run (several nodes) would be smaller still; not measured. Each configuration was run once; I/O on shared storage adds noise. Output agreement of the MPI run with serial Fortran was not checked here (speed comparison only).

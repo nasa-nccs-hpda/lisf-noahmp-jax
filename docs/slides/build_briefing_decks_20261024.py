@@ -84,7 +84,7 @@ def management():
         _metric(p, mx, y + 82, mw, 70, "Qle p99 0.038 W/m2", "Latent heat, CONUS 89 days", "Range 571 W/m2; maxima (84 W/m2) sit on single snow-melt tiles.", GREEN)
         _metric(p, mx, y + 158, mw, 70, "Reduced scope", "Not a full LIS", "Noah-MP, Noah, Mosaic, CLSM; two forcings; no VIC/CLM2/RUC.", ORANGE)
         banner(p, MARGIN, y + 290, W - 2 * MARGIN, 62,
-               "Bottom line: Noah-MP (including the 5.0 version of primary interest) reproduces the real Fortran model closely and runs 2.4 to 172 times faster for the cases tested (5.0 on CONUS: 60 d 172x, 150 d about 140x). It is a research result for named cases; other land models, other forcings, MPI and LVT are not ported.", AMBER, 11)
+               "Bottom line: Noah-MP (including the 5.0 version of primary interest) reproduces the real Fortran model closely and runs 2.4 to 172 times faster than one CPU core for the cases tested (8.7 times faster than 40-core MPI Fortran on the 60-day CONUS case) (5.0 on CONUS: 60 d 172x, 150 d about 140x). It is a research result for named cases; other land models, other forcings, MPI and LVT are not ported.", AMBER, 11)
         p.text(MARGIN, y + 362, W - 2 * MARGIN, "Fortran = real LIS 7.8 built with GNU 14.2, serial, one core. JAX = V100 unless stated. Every row compares the same simulation and the same output files.", 9.5, MUTED, maxh=30)
         footer(p, n, "BENCHMARKS.md; LOG.md entries 2026-10-22 (global Jan, HyMAP2 2-day, CONUS 7-day, CLSM 1-day); gpu_runs/clsm_bench_37944930.out")
         return p
@@ -96,7 +96,7 @@ def management():
             ("2  REFERENCE", "LISF built with GNU 14.2 (serial) so every JAX result has a real run to match.", "Three serial-build bugs patched in the build copy only.", BLUE),
             ("3  LAND MODELS", "Noah 3.9/3.6, Noah-MP 4.0.1 + land ice, ensembles, perturbations, restart.", "Global and CONUS; CONUS 30 d: 82.6x.", GREEN),
             ("4  DA, ROUTING, CLSM", "Soil-moisture EnKF, HyMAP2 river routing, Catchment LSM F2.5.", "13.2x routing 2 d; CLSM 13.6x 1 d.", GREEN),
-            ("5  NOAH-MP 5.0", "5.0 with land ice and ~25 option variants; CONUS 60 d, Feb-Jul and SGP year checked.", "10.6x SGP year; CONUS 60 d 172x, 150 d ~140x.", GREEN),
+            ("5  NOAH-MP 5.0", "5.0 with land ice and ~25 option variants; CONUS 60 d, Feb-Jul and SGP year checked.", "10.6x SGP year; CONUS 60 d 172x vs 1 core (8.7x vs 40-core MPI), 150 d ~140x vs 1 core.", GREEN),
         ]
         cw, gap = 166, 14
         for i, (t_, txt, res, col) in enumerate(steps):
@@ -121,8 +121,8 @@ def management():
         ], GREEN, 11.2)
         _cards(p, MARGIN + cw + gap, y + 6, cw, 270, "NOT ESTABLISHED", [
             "About 0.25% of CLSM tiles (cold, partly frozen soil) amplify a 1 J/m2 rounding difference to 3 K in one step; maxima there (Qle 82 W/m2) say little about the port.",
-            "One Fortran build, one compiler, one core; JAX speed-ups are against a serial reference, not MPI LIS.",
-            "Noah-MP 5.0 on CONUS 60 days: 172x, SWE p99 0.023 mm; Feb-Jul 150 d: JAX 790 s, ~140x, Apr-May segments agree; other models over months NOT KNOWN. 5.0 options ported since (runoff 6-8, dveg 2/5/6, tile drainage, irrigation, crop 1-5) are checked on SGP days only; dveg 7-9 (input LAI) is in the runner and matches the real LIS in a 20 d closed loop.",
+            "One Fortran build, one compiler. Speed-ups are vs one core; vs 40-core MPI the 60 d CONUS case is 8.7x.",
+            "Noah-MP 5.0 on CONUS 60 days: 172x (1 core), SWE p99 0.023 mm; Feb-Jul 150 d: JAX 790 s, ~140x, Apr-May segments agree; other models over months NOT KNOWN. 5.0 options ported since (runoff 6-8, dveg 2/5/6, tile drainage, irrigation, crop 1-5) are checked on SGP days only; dveg 7-9 (input LAI) is in the runner and matches the real LIS in a 20 d closed loop.",
             "12-member ensemble CONUS 1 day: 19.5x; spread itself not compared. 5.0 assimilation has no Fortran reference.",
             "CLSM from a summer coldstart is NOT reproduced (Qle p99 31 W/m2 after 24 h); only NLDAS-2 and MERRA-2 forcing.",
         ], ORANGE, 11.2)
@@ -309,7 +309,7 @@ def developer():
                 ["Noah-MP SGP 365 d", "2,983 s", "286.5 s", "10.4x / 90.4%", "jobs 37946318/338; forcing 185 s, device 90 s"],
                 ["Noah-MP 5.0 SGP 365 d", "2,945 s", "277 s", "10.6x / 90.6%", "job 37946426; forcing 166 s, device 101 s"],
                 ["Noah-MP CONUS 89 d", "57,400 s*", "345 s", "166x / 99.4%", "*59 d measured 38,095 s, scaled; job 37946514"],
-                ["Noah-MP 5.0 CONUS 60 d", "43,944 s", "255 s", "172x / 99.4%", "jobs 37946608/40; Fortran measured"],
+                ["Noah-MP 5.0 CONUS 60 d", "43,944 s", "255 s", "172x (1 core); 8.7x (40-core MPI) / 99.4%", "jobs 37946608/40; Fortran measured"],
                 ["Noah-MP 5.0 CONUS 150 d", "110,700 s*", "790 s", "140x / 99.3%", "*121 d measured, scaled; chained segments"],
                 ["Noah 3.6 Step 2 SGP 365 d", "2,247 s", "256.8 s", "8.75x / 88.6%", "jobs 37946294/338; forcing 186 s"],
                 ["Noah-MP 3.6 CONUS 2 d", "1,263 s", "46.3 s", "27.3x / 96.3%", "job 37946095, gpu006"],

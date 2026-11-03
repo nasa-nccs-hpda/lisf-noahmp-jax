@@ -1,0 +1,147 @@
+&noahmp_crop_parameters
+ ! NCROP = 5
+ !  1: Corn
+ !  2: Soybean
+ !  3: Sorghum
+ !  4: Rice
+ !  5: Winter wheat
+
+ DEFAULT_CROP     = 1           ! default crop type (1-5); if =0, use generic dynamic vegetation
+
+!-------------------------------------------------------
+! CropType:        1       2       3       4       5
+!-------------------------------------------------------
+ PLTDAY     =    111,    131,    111,    111,    111,    ! Planting date
+ HSDAY      =    300,    280,    300,    300,    300,    ! Harvest date
+ PLANTPOP   =   78.0,   78.0,   78.0,   78.0,   78.0,    ! Plant density [per ha]
+ GDDTBASE   =   10.0,   10.0,   10.0,   10.0,   10.0,    ! Base temperature for Grow Degree Day (GDD) accumulation [C]
+ GDDTCUT    =   30.0,   30.0,   30.0,   30.0,   30.0,    ! Upper temperature for Grow Degree Day (GDD) accumulation [C]
+ GDDS1      =   50.0,   60.0,   50.0,   50.0,   50.0,    ! Grow Degree Day (GDD) from seeding to emergence
+ GDDS2      =  625.0,  675.0,  718.0,  718.0,  718.0,    ! Grow Degree Day (GDD) from seeding to initial vegetative
+ GDDS3      =  933.0, 1183.0,  933.0,  933.0,  933.0,    ! Grow Degree Day (GDD) from seeding to post vegetative
+ GDDS4      = 1103.0, 1253.0, 1103.0, 1103.0, 1103.0,    ! Grow Degree Day (GDD) from seeding to intial reproductive
+ GDDS5      = 1555.0, 1605.0, 1555.0, 1555.0, 1555.0,    ! Grow Degree Day (GDD) from seeding to pysical maturity
+ C3PSNI     =    0.0,    1.0,    1.0,    1.0,    1.0,    ! photosynthetic pathway: 0.0 = c4, 1.0 = c3; the following 11 *I parameters added by Z. Zhang, 2020/02
+ KC25I      =   30.0,   30.0,   30.0,   30.0,   30.0,    ! CO2 michaelis-menten constant at 25 degC (pa)
+ AKCI       =    2.1,    2.1,    2.1,    2.1,    2.1,    ! q10 for KC25; change in CO2 Michaelis-Menten constant for every 10-degC temperature change
+ KO25I      =   3.E4,   3.E4,   3.E4,   3.E4,   3.E4,    ! O2 michaelis-menten constant at 25 degC (pa)
+ AKOI       =    1.2,    1.2,    1.2,    1.2,    1.2,    ! q10 for KO25; change in O2 Michaelis-Menten constant for every 10-degC temperature change
+ AVCMXI     =    2.4,    2.4,    2.4,    2.4,    2.4,    ! q10 for VCMZ25; change in maximum rate of carboxylation for every 10-degC temperature change
+ VCMX25I    =   60.0,   80.0,   60.0,   60.0,   55.0,    ! maximum rate of carboxylation at 25c (umol CO2/m2/s)
+ BPI        =   4.E4,   1.E4,   2.E3,   2.E3,   2.E3,    ! minimum leaf conductance (umol/m2/s)
+ MPI        =     4.,     9.,     6.,     9.,     9.,    ! slope of conductance-to-photosynthesis relationship
+ FOLNMXI    =    1.5,    1.5,    1.5,    1.5,    1.5,    ! foliage nitrogen concentration when f(n)=1 (%)
+ QE25I      =   0.05,   0.06,   0.06,   0.06,   0.06,    ! quantum efficiency at 25 degC (umol CO2/umol photon)
+ Aref       =    7.0,    7.0,    7.0,    7.0,    7.0,    ! reference maximum CO2 assimilation rate
+ PSNRF      =   0.85,   0.85,   0.85,   0.85,   0.85,    ! CO2 assimilation reduction factor(0-1) (caused by non-modeling part,e.g.pest,weeds)
+ I2PAR      =    0.5,    0.5,    0.5,    0.5,    0.5,    ! Fraction of incoming solar radiation to photosynthetically active radiation
+ TASSIM0    =    8.0,    8.0,    8.0,    8.0,    8.0,    ! Minimum temperature for CO2 assimilation [C]
+ TASSIM1    =   18.0,   18.0,   18.0,   18.0,   18.0,    ! CO2 assimilation linearly increasing until temperature reaches T1 [C]
+ TASSIM2    =   30.0,   30.0,   30.0,   30.0,   30.0,    ! CO2 assmilation rate remain at Aref until temperature reaches T2 [C]
+ K          =   0.55,   0.55,   0.55,   0.55,   0.55,    ! light extinction coefficient
+ EPSI       =   12.5,   12.5,   12.5,   12.5,   12.5,    ! initial light use efficiency
+ Q10MR      =    2.0,    2.0,    2.0,    2.0,    2.0,    ! q10 for maintainance respiration; change in maintainance respiration for every 10-degC temperature change
+ LEFREEZ    =    268,    268,    268,    268,    268,    ! characteristic T for leaf freezing [K]
+ DILE_FC_S1 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! coeficient for temperature leaf stress death [1/s] at growth stage 1
+ DILE_FC_S2 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! coeficient for temperature leaf stress death [1/s] at growth stage 2
+ DILE_FC_S3 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! coeficient for temperature leaf stress death [1/s] at growth stage 3
+ DILE_FC_S4 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! coeficient for temperature leaf stress death [1/s] at growth stage 4
+ DILE_FC_S5 =    0.5,    0.5,    0.5,    0.5,    0.5,    ! coeficient for temperature leaf stress death [1/s] at growth stage 5
+ DILE_FC_S6 =    0.5,    0.5,    0.5,    0.5,    0.5,    ! coeficient for temperature leaf stress death [1/s] at growth stage 6
+ DILE_FC_S7 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! coeficient for temperature leaf stress death [1/s] at growth stage 7
+ DILE_FC_S8 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! coeficient for temperature leaf stress death [1/s] at growth stage 8
+ DILE_FW_S1 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! coeficient for water leaf stress death [1/s] at growth stage 1
+ DILE_FW_S2 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! coeficient for water leaf stress death [1/s] at growth stage 2
+ DILE_FW_S3 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! coeficient for water leaf stress death [1/s] at growth stage 3
+ DILE_FW_S4 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! coeficient for water leaf stress death [1/s] at growth stage 4
+ DILE_FW_S5 =    0.2,    0.2,    0.2,    0.2,    0.2,    ! coeficient for water leaf stress death [1/s] at growth stage 5
+ DILE_FW_S6 =    0.2,    0.2,    0.2,    0.2,    0.2,    ! coeficient for water leaf stress death [1/s] at growth stage 6
+ DILE_FW_S7 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! coeficient for water leaf stress death [1/s] at growth stage 7
+ DILE_FW_S8 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! coeficient for water leaf stress death [1/s] at growth stage 8
+ FRA_GR     =    0.2,    0.2,    0.2,    0.2,    0.2,    ! fraction of growth respiration
+ LF_OVRC_S1 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of leaf turnover  [1/s] at growth stage 1
+ LF_OVRC_S2 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of leaf turnover  [1/s] at growth stage 2
+ LF_OVRC_S3 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of leaf turnover  [1/s] at growth stage 3
+ LF_OVRC_S4 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of leaf turnover  [1/s] at growth stage 4
+ LF_OVRC_S5 =    0.2,    0.2,   0.48,   0.48,   0.48,    ! fraction of leaf turnover  [1/s] at growth stage 5
+ LF_OVRC_S6 =    0.3,    0.3,   0.48,   0.48,   0.48,    ! fraction of leaf turnover  [1/s] at growth stage 6
+ LF_OVRC_S7 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of leaf turnover  [1/s] at growth stage 7
+ LF_OVRC_S8 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of leaf turnover  [1/s] at growth stage 8
+ ST_OVRC_S1 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of stem turnover  [1/s] at growth stage 1
+ ST_OVRC_S2 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of stem turnover  [1/s] at growth stage 2
+ ST_OVRC_S3 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of stem turnover  [1/s] at growth stage 3
+ ST_OVRC_S4 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of stem turnover  [1/s] at growth stage 4
+ ST_OVRC_S5 =    0.2,   0.12,   0.12,   0.12,   0.12,    ! fraction of stem turnover  [1/s] at growth stage 5
+ ST_OVRC_S6 =    0.3,   0.06,   0.06,   0.06,   0.06,    ! fraction of stem turnover  [1/s] at growth stage 6
+ ST_OVRC_S7 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of stem turnover  [1/s] at growth stage 7
+ ST_OVRC_S8 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of stem turnover  [1/s] at growth stage 8
+ RT_OVRC_S1 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of root tunrover  [1/s] at growth stage 1
+ RT_OVRC_S2 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of root tunrover  [1/s] at growth stage 2
+ RT_OVRC_S3 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of root tunrover  [1/s] at growth stage 3
+ RT_OVRC_S4 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of root tunrover  [1/s] at growth stage 4
+ RT_OVRC_S5 =   0.12,   0.12,   0.12,   0.12,   0.12,    ! fraction of root tunrover  [1/s] at growth stage 5
+ RT_OVRC_S6 =   0.06,   0.06,   0.06,   0.06,   0.06,    ! fraction of root tunrover  [1/s] at growth stage 6
+ RT_OVRC_S7 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of root tunrover  [1/s] at growth stage 7
+ RT_OVRC_S8 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of root tunrover  [1/s] at growth stage 8
+ LFMR25     =    0.8,    1.0,    1.0,    1.0,    1.0,    ! leaf maintenance respiration at 25C [umol CO2/m2/s]
+ STMR25     =   0.05,   0.05,    0.1,    0.1,    0.1,    ! stem maintenance respiration at 25C [umol CO2/kg bio/s]
+ RTMR25     =   0.05,   0.05,    0.0,    0.0,    0.0,    ! root maintenance respiration at 25C [umol CO2/kg bio/s]
+ GRAINMR25  =    0.0,    0.0,    0.1,    0.1,    0.1,    ! grain maintenance respiration at 25C [umol CO2/kg bio/s]
+ LFPT_S1    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to leaf at growth stage 1
+ LFPT_S2    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to leaf at growth stage 2
+ LFPT_S3    =   0.36,    0.4,    0.4,    0.4,    0.4,    ! fraction of carbohydrate flux to leaf at growth stage 3
+ LFPT_S4    =    0.1,    0.2,    0.2,    0.2,    0.2,    ! fraction of carbohydrate flux to leaf at growth stage 4
+ LFPT_S5    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to leaf at growth stage 5
+ LFPT_S6    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to leaf at growth stage 6
+ LFPT_S7    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to leaf at growth stage 7
+ LFPT_S8    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to leaf at growth stage 8
+ STPT_S1    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to stem at growth stage 1
+ STPT_S2    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to stem at growth stage 2
+ STPT_S3    =   0.24,    0.2,    0.2,    0.2,    0.2,    ! fraction of carbohydrate flux to stem at growth stage 3
+ STPT_S4    =    0.6,    0.5,    0.5,    0.5,    0.5,    ! fraction of carbohydrate flux to stem at growth stage 4
+ STPT_S5    =    0.0,    0.0,   0.15,   0.15,   0.15,    ! fraction of carbohydrate flux to stem at growth stage 5
+ STPT_S6    =    0.0,    0.0,   0.05,   0.05,   0.05,    ! fraction of carbohydrate flux to stem at growth stage 6
+ STPT_S7    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to stem at growth stage 7
+ STPT_S8    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to stem at growth stage 8
+ RTPT_S1    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to root at growth stage 1
+ RTPT_S2    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to root at growth stage 2
+ RTPT_S3    =    0.4,    0.4,    0.4,    0.4,    0.4,    ! fraction of carbohydrate flux to root at growth stage 3
+ RTPT_S4    =    0.3,    0.3,    0.3,    0.3,    0.3,    ! fraction of carbohydrate flux to root at growth stage 4
+ RTPT_S5    =   0.05,   0.05,   0.05,   0.05,   0.05,    ! fraction of carbohydrate flux to root at growth stage 5
+ RTPT_S6    =    0.0,    0.0,   0.05,   0.05,   0.05,    ! fraction of carbohydrate flux to root at growth stage 6
+ RTPT_S7    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to root at growth stage 7
+ RTPT_S8    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to root at growth stage 8
+ GRAINPT_S1 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to grain at growth stage 1
+ GRAINPT_S2 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to grain at growth stage 2
+ GRAINPT_S3 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to grain at growth stage 3
+ GRAINPT_S4 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to grain at growth stage 4
+ GRAINPT_S5 =   0.95,   0.95,    0.8,    0.8,    0.8,    ! fraction of carbohydrate flux to grain at growth stage 5
+ GRAINPT_S6 =    1.0,    1.0,    0.9,    0.9,    0.9,    ! fraction of carbohydrate flux to grain at growth stage 6
+ GRAINPT_S7 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to grain at growth stage 7
+ GRAINPT_S8 =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate flux to grain at growth stage 8
+ LFCT_S1    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate translocation from leaf to grain at growth stage 1
+ LFCT_S2    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate translocation from leaf to grain at growth stage 2
+ LFCT_S3    =    0.0,    0.0,    0.4,    0.4,    0.4,    ! fraction of carbohydrate translocation from leaf to grain at growth stage 3
+ LFCT_S4    =    0.0,    0.0,    0.3,    0.3,    0.3,    ! fraction of carbohydrate translocation from leaf to grain at growth stage 4
+ LFCT_S5    =    0.0,    0.0,   0.05,   0.05,   0.05,    ! fraction of carbohydrate translocation from leaf to grain at growth stage 5
+ LFCT_S6    =    0.0,    0.0,   0.05,   0.05,   0.05,    ! fraction of carbohydrate translocation from leaf to grain at growth stage 6
+ LFCT_S7    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate translocation from leaf to grain at growth stage 7
+ LFCT_S8    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate translocation from leaf to grain at growth stage 8
+ STCT_S1    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate translocation from stem to grain at growth stage 1
+ STCT_S2    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate translocation from stem to grain at growth stage 2
+ STCT_S3    =    0.0,    0.0,    0.4,    0.4,    0.4,    ! fraction of carbohydrate translocation from stem to grain at growth stage 3
+ STCT_S4    =    0.0,    0.0,    0.3,    0.3,    0.3,    ! fraction of carbohydrate translocation from stem to grain at growth stage 4
+ STCT_S5    =    0.0,    0.0,   0.05,   0.05,   0.05,    ! fraction of carbohydrate translocation from stem to grain at growth stage 5
+ STCT_S6    =    0.0,    0.0,   0.05,   0.05,   0.05,    ! fraction of carbohydrate translocation from stem to grain at growth stage 6
+ STCT_S7    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate translocation from stem to grain at growth stage 7
+ STCT_S8    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate translocation from stem to grain at growth stage 8
+ RTCT_S1    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate translocation from root to grain at growth stage 1
+ RTCT_S2    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate translocation from root to grain at growth stage 2
+ RTCT_S3    =    0.0,    0.0,    0.4,    0.4,    0.4,    ! fraction of carbohydrate translocation from root to grain at growth stage 3
+ RTCT_S4    =    0.0,    0.0,    0.3,    0.3,    0.3,    ! fraction of carbohydrate translocation from root to grain at growth stage 4
+ RTCT_S5    =    0.0,    0.0,   0.05,   0.05,   0.05,    ! fraction of carbohydrate translocation from root to grain at growth stage 5
+ RTCT_S6    =    0.0,    0.0,   0.05,   0.05,   0.05,    ! fraction of carbohydrate translocation from root to grain at growth stage 6
+ RTCT_S7    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate translocation from root to grain at growth stage 7
+ RTCT_S8    =    0.0,    0.0,    0.0,    0.0,    0.0,    ! fraction of carbohydrate translocation from root to grain at growth stage 8
+ BIO2LAI    =  0.015,  0.030,  0.015,  0.015,  0.015,    ! leaf area per living leaf biomass [m2/kg]
+/

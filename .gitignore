@@ -132,7 +132,7 @@ dmypy.json
 # Client data and local credentials
 .env.*
 !.env.example
-data/
+/data/
 *.pem
 *.key
 
@@ -140,4 +140,3 @@ data/
 docs/reports/gpu_runs/
 docs/slides/preview_*/
 .pytest_full.log
-tests/data/**/*.tmp

@@ -1,0 +1,94 @@
+--- /panfs/ccds02/nobackup/people/gtamkin/dev/lisf_build/noah39_main.F90.orig	2026-10-21 22:39:41.850249487 -0400
++++ noah39_main.F90	2026-10-22 00:39:53.617340902 -0400
+@@ -42,6 +42,7 @@
+   use module_sfcdif_wrf_39, only: SFCDIF_MYJ
+   use module_sf_noah39lsm_glacial, only : SFLX_glacial
+   use noah39_lsmMod
++  use jaxdump_mod
+   use LIS_tbotAdjustMod, only: LIS_tbotTimeUtil,LIS_updateTbot
+ 
+   implicit none
+@@ -154,6 +155,8 @@
+   real        :: ribb 
+   real        :: ptu
+   real        :: ustar
++  real        :: jd_pre(JD_NPRE), jd_post(JD_NPOST), jd_ch0, jd_cm0
++  integer     :: jd_hdr(JD_NHDR)
+   integer       ::  soiltyp
+   character*256 ::  llanduse, lsoil
+ 
+@@ -508,6 +511,8 @@
+ #if (!defined COUPLED)
+         ! If the offline forcing is not providing the exchange coefficients,
+         ! then let Noah-3.9 calculate its own surface aerodynamic conductance.
++        jd_ch0 = noah39_struc(n)%noah(t)%ch
++        jd_cm0 = noah39_struc(n)%noah(t)%cm
+         if ((noah39_struc(n)%forcing_ch.eq.0).or.(noah39_struc(n)%forcing_cm.eq.0)) then
+            if (noah39_struc(n)%sfcdifoption.eq.0) then
+               CALL SFCDIF_OFF(ZLVL,ZLVL_WIND,noah39_struc(n)%noah(t)%z0_old,&
+@@ -753,6 +758,18 @@
+         if (ice.eq.0) then 
+            col = LIS_surface(n,LIS_rc%lsm_index)%tile(t)%col
+            row = LIS_surface(n,LIS_rc%lsm_index)%tile(t)%row
++           jd_hdr = (/ LIS_rc%yr, LIS_rc%mo, LIS_rc%da, LIS_rc%hr, LIS_rc%mn, LIS_rc%ss, t, col, row /)
++           jd_pre = 0.0
++           jd_pre(1:58) = (/ ffrozp, dt, zlvl, lwdn, soldn, solnet, sfcprs, prcp, sfctmp, q2, sfcspd, th2, q2sat, dqsdt2, &
++                real(noah39_struc(n)%noah(t)%vegt), real(soiltyp), slope, noah39_struc(n)%noah(t)%shdfac, noah39_struc(n)%noah(t)%shdmin, noah39_struc(n)%noah(t)%shdmax, noah39_struc(n)%noah(t)%alb, snoalb, tbot, noah39_struc(n)%noah(t)%z0brd, noah39_struc(n)%noah(t)%z0, noah39_struc(n)%noah(t)%emiss, noah39_struc(n)%noah(t)%embrd, &
++                noah39_struc(n)%noah(t)%cmc, noah39_struc(n)%noah(t)%t1, noah39_struc(n)%noah(t)%stc(1), noah39_struc(n)%noah(t)%stc(2), noah39_struc(n)%noah(t)%stc(3), noah39_struc(n)%noah(t)%stc(4), noah39_struc(n)%noah(t)%smc(1), noah39_struc(n)%noah(t)%smc(2), noah39_struc(n)%noah(t)%smc(3), noah39_struc(n)%noah(t)%smc(4), &
++                noah39_struc(n)%noah(t)%sh2o(1), noah39_struc(n)%noah(t)%sh2o(2), noah39_struc(n)%noah(t)%sh2o(3), noah39_struc(n)%noah(t)%sh2o(4), noah39_struc(n)%noah(t)%snowh, noah39_struc(n)%noah(t)%sneqv, noah39_struc(n)%noah(t)%albedo, noah39_struc(n)%noah(t)%ch, noah39_struc(n)%noah(t)%cm, noah39_struc(n)%noah(t)%ztopv, noah39_struc(n)%noah(t)%zbotv, &
++                noah39_struc(n)%noah(t)%snotime1, ribb, noah39_struc(n)%noah(t)%lai, noah39_struc(n)%noah(t)%rsmin, jd_ch0, jd_cm0, noah39_struc(n)%noah(t)%z0_old, t1v, th2v, sfcspd /)
++           jd_pre(59:99) = (/ noah39_struc(n)%noah(t)%smcwlt, noah39_struc(n)%noah(t)%smcdry, noah39_struc(n)%noah(t)%smcref, noah39_struc(n)%noah(t)%smcmax, real(noah39_struc(n)%noah(t)%nroot), noah39_struc(n)%noah(t)%hs, noah39_struc(n)%noah(t)%rgl, noah39_struc(n)%noah(t)%snup, noah39_struc(n)%noah(t)%cmcmax, noah39_struc(n)%noah(t)%rsmax, noah39_struc(n)%noah(t)%topt, &
++                noah39_struc(n)%noah(t)%bexp, noah39_struc(n)%noah(t)%dksat, noah39_struc(n)%noah(t)%dwsat, noah39_struc(n)%noah(t)%f1, noah39_struc(n)%noah(t)%quartz, noah39_struc(n)%noah(t)%psisat, noah39_struc(n)%noah(t)%czil, noah39_struc(n)%noah(t)%sbeta, noah39_struc(n)%noah(t)%fxexp, noah39_struc(n)%noah(t)%csoil, noah39_struc(n)%noah(t)%salp, noah39_struc(n)%noah(t)%kdt, noah39_struc(n)%noah(t)%cfactr, noah39_struc(n)%noah(t)%zbot, &
++                noah39_struc(n)%noah(t)%refkdt, noah39_struc(n)%noah(t)%frzx, noah39_struc(n)%noah(t)%sndens, noah39_struc(n)%noah(t)%lvcoef, real(noah39_struc(n)%opt_thcnd), noah39_struc(n)%aoasis, real(isurban), real(nsoil), &
++                noah39_struc(n)%noah(t)%z0brd_old, noah39_struc(n)%noah(t)%q1, real(noah39_struc(n)%iz0tlnd), real(noah39_struc(n)%sfcdifoption), real(merge(1,0,noah39_struc(n)%ua_phys)), &
++                0.0, 0.0, 0.0 /)
+            call sflx(iiloc,jjloc,                                                                 &
+                 ffrozp, isurban, dt, zlvl, nsoil, sldpth,                             &
+                 local,                                                                &
+@@ -809,6 +826,13 @@
+                 noah39_struc(n)%opt_fasdas,                                      &
+                 noah39_struc(n)%noah(t)%hcpct_fasdas)
+ 
++           jd_post = 0.0
++           jd_post(1:56) = (/ noah39_struc(n)%noah(t)%cmc, noah39_struc(n)%noah(t)%t1, noah39_struc(n)%noah(t)%stc(1), noah39_struc(n)%noah(t)%stc(2), noah39_struc(n)%noah(t)%stc(3), noah39_struc(n)%noah(t)%stc(4), noah39_struc(n)%noah(t)%smc(1), noah39_struc(n)%noah(t)%smc(2), noah39_struc(n)%noah(t)%smc(3), noah39_struc(n)%noah(t)%smc(4), &
++                noah39_struc(n)%noah(t)%sh2o(1), noah39_struc(n)%noah(t)%sh2o(2), noah39_struc(n)%noah(t)%sh2o(3), noah39_struc(n)%noah(t)%sh2o(4), noah39_struc(n)%noah(t)%snowh, noah39_struc(n)%noah(t)%sneqv, noah39_struc(n)%noah(t)%albedo, noah39_struc(n)%noah(t)%ch, noah39_struc(n)%noah(t)%cm, sncovr, noah39_struc(n)%noah(t)%z0, &
++                noah39_struc(n)%noah(t)%snotime1, noah39_struc(n)%noah(t)%q1, noah39_struc(n)%noah(t)%emiss, noah39_struc(n)%noah(t)%lai, noah39_struc(n)%noah(t)%shdfac, eta, shtflx, gflx, etp, edir, ec, ett, esnow, noah39_struc(n)%noah(t)%runoff1, noah39_struc(n)%noah(t)%runoff2, &
++                runoff3, snomlt, drip, dew, beta, fdown, rc, pc, soilm, soilw, tsoil, flx1, flx2, flx3, ustar, evp, eta_kinematic, &
++                noah39_struc(n)%noah(t)%rsmin, noah39_struc(n)%noah(t)%smcmax, noah39_struc(n)%noah(t)%smcwlt /)
++           call jaxdump_write(jd_hdr, jd_pre, jd_post)
+            noah39_struc(n)%noah(t)%sca = sncovr ! EMK NUWRF
+            noah39_struc(n)%noah(t)%z0_old = noah39_struc(n)%noah(t)%z0
+ 
+@@ -965,6 +989,18 @@
+ 
+            ! SW/ZW CALL SFLX_GLACIAL(ICE,FFROZP,DT,ZLVL,NSOIL,SLDPTH,          &
+            ! The interface for Noah 3.9 has been changed. SW/ZW 
++           jd_hdr = (/ LIS_rc%yr, LIS_rc%mo, LIS_rc%da, LIS_rc%hr, LIS_rc%mn, 99, t, 0, 0 /)
++           jd_pre = 0.0
++           jd_pre(1:58) = (/ ffrozp, dt, zlvl, lwdn, soldn, solnet, sfcprs, prcp, sfctmp, q2, sfcspd, th2, q2sat, dqsdt2, &
++                real(noah39_struc(n)%noah(t)%vegt), real(soiltyp), slope, noah39_struc(n)%noah(t)%shdfac, noah39_struc(n)%noah(t)%shdmin, noah39_struc(n)%noah(t)%shdmax, noah39_struc(n)%noah(t)%alb, snoalb, tbot, noah39_struc(n)%noah(t)%z0brd, noah39_struc(n)%noah(t)%z0, noah39_struc(n)%noah(t)%emiss, noah39_struc(n)%noah(t)%embrd, &
++                noah39_struc(n)%noah(t)%cmc, noah39_struc(n)%noah(t)%t1, noah39_struc(n)%noah(t)%stc(1), noah39_struc(n)%noah(t)%stc(2), noah39_struc(n)%noah(t)%stc(3), noah39_struc(n)%noah(t)%stc(4), noah39_struc(n)%noah(t)%smc(1), noah39_struc(n)%noah(t)%smc(2), noah39_struc(n)%noah(t)%smc(3), noah39_struc(n)%noah(t)%smc(4), &
++                noah39_struc(n)%noah(t)%sh2o(1), noah39_struc(n)%noah(t)%sh2o(2), noah39_struc(n)%noah(t)%sh2o(3), noah39_struc(n)%noah(t)%sh2o(4), noah39_struc(n)%noah(t)%snowh, noah39_struc(n)%noah(t)%sneqv, noah39_struc(n)%noah(t)%albedo, noah39_struc(n)%noah(t)%ch, noah39_struc(n)%noah(t)%cm, noah39_struc(n)%noah(t)%ztopv, noah39_struc(n)%noah(t)%zbotv, &
++                noah39_struc(n)%noah(t)%snotime1, ribb, noah39_struc(n)%noah(t)%lai, noah39_struc(n)%noah(t)%rsmin, jd_ch0, jd_cm0, noah39_struc(n)%noah(t)%z0_old, t1v, th2v, sfcspd /)
++           jd_pre(59:99) = (/ noah39_struc(n)%noah(t)%smcwlt, noah39_struc(n)%noah(t)%smcdry, noah39_struc(n)%noah(t)%smcref, noah39_struc(n)%noah(t)%smcmax, real(noah39_struc(n)%noah(t)%nroot), noah39_struc(n)%noah(t)%hs, noah39_struc(n)%noah(t)%rgl, noah39_struc(n)%noah(t)%snup, noah39_struc(n)%noah(t)%cmcmax, noah39_struc(n)%noah(t)%rsmax, noah39_struc(n)%noah(t)%topt, &
++                noah39_struc(n)%noah(t)%bexp, noah39_struc(n)%noah(t)%dksat, noah39_struc(n)%noah(t)%dwsat, noah39_struc(n)%noah(t)%f1, noah39_struc(n)%noah(t)%quartz, noah39_struc(n)%noah(t)%psisat, noah39_struc(n)%noah(t)%czil, noah39_struc(n)%noah(t)%sbeta, noah39_struc(n)%noah(t)%fxexp, noah39_struc(n)%noah(t)%csoil, noah39_struc(n)%noah(t)%salp, noah39_struc(n)%noah(t)%kdt, noah39_struc(n)%noah(t)%cfactr, noah39_struc(n)%noah(t)%zbot, &
++                noah39_struc(n)%noah(t)%refkdt, noah39_struc(n)%noah(t)%frzx, noah39_struc(n)%noah(t)%sndens, noah39_struc(n)%noah(t)%lvcoef, real(noah39_struc(n)%opt_thcnd), noah39_struc(n)%aoasis, real(isurban), real(nsoil), &
++                noah39_struc(n)%noah(t)%z0brd_old, noah39_struc(n)%noah(t)%q1, real(noah39_struc(n)%iz0tlnd), real(noah39_struc(n)%sfcdifoption), real(merge(1,0,noah39_struc(n)%ua_phys)), &
++                noah39_struc(n)%noah(t)%sca, 0.0, 0.0 /)
+            CALL SFLX_GLACIAL(iiloc,jjloc, ICE,FFROZP,DT,ZLVL,NSOIL,SLDPTH,          &
+                 LWDN,SOLNET,SFCPRS,PRCP,SFCTMP,Q2,                     &
+                 TH2,Q2SAT,DQSDT2,                                      &
+@@ -991,6 +1027,13 @@
+ 
+ ! flx4 is not calculated in the glacial physics,
+ ! so set it to zero, as it is output on land points. - D. Mocko
++           jd_post = 0.0
++           jd_post(1:56) = (/ noah39_struc(n)%noah(t)%cmc, noah39_struc(n)%noah(t)%t1, noah39_struc(n)%noah(t)%stc(1), noah39_struc(n)%noah(t)%stc(2), noah39_struc(n)%noah(t)%stc(3), noah39_struc(n)%noah(t)%stc(4), noah39_struc(n)%noah(t)%smc(1), noah39_struc(n)%noah(t)%smc(2), noah39_struc(n)%noah(t)%smc(3), noah39_struc(n)%noah(t)%smc(4), &
++                noah39_struc(n)%noah(t)%sh2o(1), noah39_struc(n)%noah(t)%sh2o(2), noah39_struc(n)%noah(t)%sh2o(3), noah39_struc(n)%noah(t)%sh2o(4), noah39_struc(n)%noah(t)%snowh, noah39_struc(n)%noah(t)%sneqv, noah39_struc(n)%noah(t)%albedo, noah39_struc(n)%noah(t)%ch, noah39_struc(n)%noah(t)%cm, sncovr, noah39_struc(n)%noah(t)%z0, &
++                noah39_struc(n)%noah(t)%snotime1, noah39_struc(n)%noah(t)%q1, noah39_struc(n)%noah(t)%emiss, noah39_struc(n)%noah(t)%lai, noah39_struc(n)%noah(t)%shdfac, eta, shtflx, gflx, etp, edir, ec, ett, esnow, noah39_struc(n)%noah(t)%runoff1, noah39_struc(n)%noah(t)%runoff2, &
++                runoff3, snomlt, 0.0, dew, 0.0, fdown, rc, 0.0, soilm, 0.0, tsoil, flx1, flx2, flx3, ustar, evp, eta_kinematic, &
++                noah39_struc(n)%noah(t)%rsmin, noah39_struc(n)%noah(t)%smcmax, noah39_struc(n)%noah(t)%smcwlt /)
++           call jaxdump_write(jd_hdr, jd_pre, jd_post)
+            flx4 = 0.0
+         endif
+ 

@@ -1,0 +1,4 @@
+Test-only patch of the LIS 7.8 build copy (surfacemodels/land/noahmp.5.0/NoahMP50_main.F90), used to build lisf_run/LIS_mp50_irr:
+after the line  NoahmpIO%IOPT_DVEG          = NoahMP50_struc(n)%dveg_opt
+add             NoahmpIO%LLANDUSE           = "MODIFIED_IGBP_MODIS_NOAH"
+Reason: the LIS Noah-MP 5.0 driver never sets NoahmpIO%LLANDUSE, so IrrigationPrepare never flags cropland and the stock LIS never irrigates.

@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lisf-noahmp-jax"
+version = "0.1.0"
+description = "JAX ports of NASA LISF land surface models (Noah-MP 3.6/4.0.1/5.0 first), validated against the real Fortran LIS"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "jax>=0.5,<0.6",
+    "netCDF4",
+]
+
+[project.optional-dependencies]
+gpu = ["jax[cuda12]>=0.5,<0.6"]
+test = ["pytest"]
+slides = ["reportlab", "Pillow", "matplotlib"]
+
+[project.scripts]
+lisf-noahmp-jax = "lisf_noahmp_jax.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"lisf_noahmp_jax.driver" = ["*.npy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

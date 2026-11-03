@@ -1,0 +1,24 @@
+--- /tmp/_h3.orig	2026-10-21 22:27:09.660983742 -0400
++++ routing/HYMAP3_router/HYMAP3_routing_writerst.F90	2026-10-21 22:27:09.672263671 -0400
+@@ -799,7 +799,7 @@
+           LIS_routing_goffsets(n,:),&
+           MPI_REAL,0,LIS_mpi_comm,ierr)
+ #else
+-     gtmp1(:,m) = var(:)
++     gtmp1(:,m) = var(:,m)
+ #endif
+   enddo
+   if(LIS_masterproc) then
+# (second HYMAP3_routing_writerst.F90 fix, same file: the "do m=" line was inside #if SPMD only, leaving an unmatched enddo in serial builds;
+#  moved "do m=1,LIS_rc%nensem(n)" above "#if (defined SPMD)")
+--- /panfs/ccds02/nobackup/people/gtamkin/dev/lisf_build/_ssmis.orig	2026-10-21 23:38:32.438276453 -0400
++++ USAFSI/USAFSI_ssmisMod.F90	2026-10-21 23:38:32.451819999 -0400
+@@ -401,7 +401,7 @@
+    ! Dummy version if no ECCODES support was compiled
+    subroutine read_bufr_attributes(filename, satid, date10_arr, lat, lon, &
+         surflag, tb19h, tb19v, tb37h, tb37v, tb22v, tb91v, tb91h)
+-      use LDT_constantMod, only: LDT_CONST_PATH_LEN
++      use LDT_constantsMod, only: LDT_CONST_PATH_LEN
+       use LDT_logMod, only: LDT_endrun, LDT_logunit
+       implicit none
+       character(len=LDT_CONST_PATH_LEN), intent(in) :: filename

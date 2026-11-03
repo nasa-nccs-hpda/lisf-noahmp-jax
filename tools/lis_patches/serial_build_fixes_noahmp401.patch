@@ -1,0 +1,18 @@
+--- /tmp/NoahMP401_setup.F90.orig	2026-10-21 22:25:15.922530624 -0400
++++ surfacemodels/land/noahmp.4.0.1/NoahMP401_setup.F90	2026-10-21 22:25:15.970491671 -0400
+@@ -266,6 +266,7 @@
+         ! 1. VEGETATION PARAMETERS
+         ! ---------------------------------------------------------
+         ! Integer Scalars
++#if (!defined HIDE_MPI)
+         call MPI_BCAST(ISURBAN_TABLE, 1, MPI_INTEGER, 0, LIS_mpi_comm, status)
+         call MPI_BCAST(ISWATER_TABLE, 1, MPI_INTEGER, 0, LIS_mpi_comm, status)
+         call MPI_BCAST(ISBARREN_TABLE, 1, MPI_INTEGER, 0, LIS_mpi_comm, status)
+@@ -461,6 +462,7 @@
+         call MPI_BCAST(sr2006_psi_e_c, 1, MPI_REAL, 0, LIS_mpi_comm, status)
+         call MPI_BCAST(sr2006_smcmax_a, 1, MPI_REAL, 0, LIS_mpi_comm, status)
+         call MPI_BCAST(sr2006_smcmax_b, 1, MPI_REAL, 0, LIS_mpi_comm, status)
++#endif
+         
+         do t=1,LIS_rc%npatch(n,mtype)
+            soiltyp = NoahMP401_struc(n)%noahmp401(t)%soiltype

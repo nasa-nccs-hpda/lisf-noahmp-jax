@@ -1,0 +1,11 @@
+/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/jax-port/lisjax/compare_tiles.py:28: RuntimeWarning: All-NaN slice encountered
+  a = np.nanmax(a.reshape((-1,) + a.shape[-2:]), axis=0); b = np.nanmax(b.reshape((-1,) + b.shape[-2:]), axis=0)
+236 history files; N = 200 worst tiles per variable
+variable     tiles  overlap  random spearman  A@Aworst  B@Aworst  B@Bworst  A@Bworst  (A=|Fortran-JAX|, B=|JAX-JAX+1ulp|, max over time)
+Qle_tavg     76180       10     0.5    0.483      9.44      5.85      42.1    0.0306
+Qh_tavg      76180       29     0.5    0.697      23.4      14.4      55.1      0.12
+Qg_tavg      76180       57     0.5    0.744      39.2      24.1      61.3      1.29
+AvgSurfT_tavg   76180       66     0.5    0.666      2.29      1.25      3.43    0.0648
+SWE_inst     53855       42     0.7    0.799      2.53      1.57      3.78    0.0235
+SoilMoist_inst   76149       45     0.5    0.201    0.0122   0.00876    0.0177  0.000134
+SoilTemp_inst   76180       52     0.5    0.808      2.53      1.87      4.02      0.17

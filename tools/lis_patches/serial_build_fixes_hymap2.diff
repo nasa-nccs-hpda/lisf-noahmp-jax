@@ -1,0 +1,51 @@
+--- /panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lis/routing/HYMAP2_router/HYMAP2_routingMod.F90	2026-10-21 19:21:20.430503148 -0400
++++ routing/HYMAP2_router/HYMAP2_routingMod.F90	2026-10-22 04:14:46.741170186 -0400
+@@ -693,6 +693,7 @@
+ 
+ #else
+        LIS_rc%glbnroutinggrid(n) = LIS_rc%nroutinggrid(n)
++       LIS_routing_gdeltas(n,0) = gdeltas   ! serial-build fix (jax-port): not set without MPI
+ #endif
+ 
+        if(LIS_masterproc) then 
+@@ -1085,6 +1086,11 @@
+             MPI_INTEGER,&
+             LIS_mpi_comm,status)
+     enddo
++#else
++    do n=1,LIS_rc%nnest   ! serial-build fix (jax-port): global sequence = local sequence
++       HYMAP2_routing_struc(n)%seqx_glb = HYMAP2_routing_struc(n)%seqx
++       HYMAP2_routing_struc(n)%seqy_glb = HYMAP2_routing_struc(n)%seqy
++    enddo
+ #endif
+ 
+     do n=1,LIS_rc%nnest
+@@ -1340,6 +1346,8 @@
+             LIS_routing_goffsets(n,:),&
+             MPI_INTEGER,&
+             LIS_mpi_comm,status)
++#else
++       HYMAP2_routing_struc(n)%droutlet_glb = HYMAP2_routing_struc(n)%droutlet   ! serial-build fix (jax-port)
+ #endif
+ 
+       deallocate(tmp_real)
+@@ -2601,6 +2609,8 @@
+        LIS_routing_gdeltas(n,:),&
+        LIS_routing_goffsets(n,:),&
+        MPI_REAL,LIS_mpi_comm,status)
++#else
++  tmpvar(1:LIS_rc%nroutinggrid(n)) = var   ! serial-build fix (jax-port)
+ #endif
+   !rearrange them to be in correct order.
+   do l=1,LIS_npes
+--- /panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lis/routing/HYMAP2_router/HYMAP2_model_core.F90	2026-10-21 19:21:20.415812062 -0400
++++ routing/HYMAP2_router/HYMAP2_model_core.F90	2026-10-22 04:14:46.748132321 -0400
+@@ -615,6 +615,8 @@
+        LIS_routing_gdeltas(n,:),&
+        LIS_routing_goffsets(n,:),&
+        MPI_REAL,LIS_mpi_comm,status)
++#else
++  tmpvar(1:LIS_rc%nroutinggrid(n)) = var   ! serial-build fix (jax-port)
+ #endif
+   !rearrange them to be in correct order.
+   do l=1,LIS_npes

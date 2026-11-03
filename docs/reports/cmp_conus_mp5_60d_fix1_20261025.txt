@@ -1,0 +1,18 @@
+240 history files compared (/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run/conus_mp5_60d/lisout vs /panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run/conus_mp5_60d/jaxout_fix1)
+variable              range        p50        p99        max  bitwise%
+SWE_inst                992   0.00e+00   2.33e-02   1.49e+01     61.96
+SnowDepth_inst          3.6   0.00e+00   1.43e-04   1.44e-01     61.75
+SoilMoist_inst        0.997   1.96e-05   7.90e-05   4.35e-02      2.10
+SoilTemp_inst          61.2   9.16e-05   2.05e-02   1.87e+01     18.83
+SmLiqFrac_inst        0.476   1.96e-05   2.12e-04   1.87e-01      2.15
+CanopInt_inst          17.9   0.00e+00   2.72e-05   1.14e+00     55.49
+Snowcover_inst            1   0.00e+00   3.25e-04   9.99e-01     78.15
+Wind_f_inst            23.6   0.00e+00   9.54e-07   1.91e-06     83.22
+Tair_f_inst            63.4   0.00e+00   0.00e+00   0.00e+00    100.00
+Qair_f_inst          0.0173   0.00e+00   0.00e+00   0.00e+00    100.00
+Psurf_f_inst       4.01e+04   0.00e+00   0.00e+00   0.00e+00    100.00
+SWdown_f_inst       1.1e+03   0.00e+00   0.00e+00   0.00e+00    100.00
+LWdown_f_inst           336   0.00e+00   0.00e+00   0.00e+00    100.00
+Landcover_inst           20   0.00e+00   0.00e+00   0.00e+00    100.00
+Greenness_inst        1e+04   0.00e+00   0.00e+00   8.92e-01    100.00
+variables with NaN only in the new run (cells): {'SoilTemp_inst': 4, 'Wind_f_inst': 4259, 'Tair_f_inst': 4259, 'Qair_f_inst': 4259, 'Psurf_f_inst': 4259, 'SWdown_f_inst': 4259, 'LWdown_f_inst': 4259, 'Landcover_inst': 27756, 'Greenness_inst': 27756}

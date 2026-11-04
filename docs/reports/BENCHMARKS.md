@@ -243,3 +243,10 @@ Same case as above. Wall time **51:32 (3,092 s)**, exit 0, all 240 history files
 | Fortran, MPI 40 ranks (8x5) | 40 cores | 2,207 s | 2.7% of tiles wrong (one rank block) | 8.7x (timing only) |
 | JAX | 1 V100 | 255 s | p99 at float32 level (see above) | 1x |
 **Quote 12.1x as the fair speed claim against parallel Fortran with verified output; 172x only as against one core.** The 40-rank run is faster but its output is not trustworthy, so it should not be the baseline.
+
+### Cause of the bad rank blocks: what is established so far (2026-11-04, cause not yet found)
+- Deterministic for a layout (8x5 gives the same block in a 5-day and a 60-day run), different blocks for different layouts, none at 20 ranks or fewer. So not random and not one faulty core or node.
+- Inside a bad block **every forcing diagnostic holds the same values** (Tair_f, Qair_f, Psurf_f, Wind_f, SWdown_f, LWdown_f, Rainf_f all show min 0, max 293.7, mean 254 K) and 9% of the cells are exactly 0. The model then sees surface pressure of about 280 Pa and blows up. The values are not a time shift (best match is the same time step, still wrong) and not a spatial shift (values do not appear anywhere in the serial field).
+- The land mask also differs in the block (2,015 land cells in MPI vs 2,083 in serial: 8 extra, 76 missing), so the block's tile or grid mapping differs, not only the forcing. That points at domain decomposition or the parallel read of the LDT parameter file, rather than the NLDAS-2 file reader alone.
+- Config uses "NLDAS2 netcdf" (plugin `metforcing/nldas-2.0`, `read_nldas20b.F90`), neighbor interpolation. The reader keeps `varfield` and `dummy` (about 400 KB) as automatic stack arrays; stack-size test submitted as `scripts/slurm/gpu_conus_mp5_mpi_stack.sbatch`.
+- Not yet tested: other forcing plugin; non-optimised build (-O0 with NaN-initialised reals); the LDT parameter read on the bad ranks.

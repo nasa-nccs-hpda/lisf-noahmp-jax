@@ -13,7 +13,7 @@ ROWS = [
  ("Land models", "Noah 3.9, 3.6, 3.3, 3.2 and 2.7.1", "Ported, validated", "Compared with the real Fortran LIS. CONUS 2 days: 3.3 is 30x, 3.2 is 32x, 2.7.1 is 28x. Noah 3.6, SGP full year: 8.75x"),
  ("", "Noah-MP 3.6", "Ported, validated", "CONUS 2 days: 27x. Runoff options 2 and 4, dynamic vegetation 1 and 3 and several other options pass"),
  ("", "Noah-MP 4.0.1 (plus land ice)", "Ported, validated", "CONUS 89 days: about 166x (Fortran extrapolated from 59 days). SGP full year: 10x"),
- ("", "Noah-MP 5.0 (plus land ice)", "Ported, validated", "CONUS 60 days: 172x vs 1 core, 8.7x vs 40-core MPI. CONUS 150 days: about 140x (Fortran extrapolated from 121 days). SGP full year: 10.6x"),
+ ("", "Noah-MP 5.0 (plus land ice)", "Ported, validated", "CONUS 60 days: 172x vs 1 core, 12.1x vs 20-core MPI. CONUS 150 days: about 140x (Fortran extrapolated from 121 days). SGP full year: 10.6x"),
  ("", "CLSM F2.5", "Ported, validated", "13.6x on CONUS 1 day. Limit: a summer cold start is not reproduced"),
  ("", "Mosaic", "Ported, validated", "21.6x on CONUS 2 days"),
  ("Noah-MP 5.0 options", "Surface runoff 6, 7, 8 (VIC, Xinanjiang, dynamic VIC)", "Ported, validated", "Checked on a rainy SGP day, replay and 3-day closed loop"),

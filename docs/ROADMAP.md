@@ -17,7 +17,7 @@ Last updated: 2026-11-04 (MPI vs serial agreement check added). Owner: G. Tamkin
 | Pri | Step | Who | Done when |
 |---|---|---|---|
 | 1 | Send the customer the speed clarification (172x vs 1 core, 8.7x vs 40-core MPI); draft is in the chat history / item 1 | G. Tamkin | Sent |
-| 2 | MPI vs serial agreement: DONE 2026-11-04, **one rank's block (2.7% of tiles) differs, rest bitwise equal**. Rerun 5 d with another decomposition to locate the cause; do not call the MPI run a clean reference until explained | Assistant | Cause identified; MPI row in the speed table annotated |
+| 2 | MPI vs serial agreement: bad rank blocks at 32 and 40 ranks (move with layout); 20 ranks and fewer are bitwise clean | Assistant | Run 60 d at 20 ranks (4x5) for a clean MPI reference and timing; find the cause of the high-rank bad blocks |
 | 3 | Independent reproduction: owner or teammate runs the 48 tests and the 60 d CONUS case from `lisf-noahmp-jax` | Owner / teammate | One external run recorded (needs repo access, see 4) |
 | 4 | Repo housekeeping: freeze `jax-port`; give owner access to the private repo; pick a license; generate `uv.lock` (needs uv); fix old-path references in historical docs and slurm scripts | G. Tamkin (decisions), assistant (edits) | CI green on `main`; no `jax-port` paths in live docs |
 | 5 | NCAR/noahmp 5.2.1: apply dump hook to `dev/lisf_build_552`, run 5.2.1 LIS, replay, port the default-path fixes as a variant (MPVER=52) | Assistant | G1 replay and G3 closed loop pass for 5.2.1 |

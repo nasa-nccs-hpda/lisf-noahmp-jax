@@ -222,3 +222,14 @@ Serial `conus_mp5_60d/lisout` vs MPI `conus_mp5_mpi/lisout_60d_n40`, 240 history
 - Not a simple grid shift (tested +/-6 cells). Cause not found. Suspects: forcing read or tile ordering on that rank in LIS's parallel path, or the 148-tile water-soil instability interacting with that subdomain.
 - **What this means for the speed table:** the 2,207 s timing is a valid wall-clock measurement of the MPI run, but that run is not a clean reference for 2.7% of the domain. It does not change the 172x (serial, clean) figure, and 8.7x stands as a timing comparison only until the block is explained. Serial vs JAX agreement results are unaffected.
 - Next: rerun the 5-day case with a different decomposition (for example 5x8 or 32 ranks). If the bad block moves with the decomposition it is a parallel-path problem; if it stays at the same geography it is a data or tile issue.
+
+### Decomposition test of the MPI disagreement (job 37950794 plus earlier 5-day runs, 2026-11-04)
+Metric: cells where forcing diagnostic Tair_f differs from serial Fortran by more than 0.01 K, summed over the 20 history files of the 5-day case. Script `scripts/slurm/gpu_conus_mp5_mpi_decomp.sbatch`.
+| Ranks, layout (x by y) | Bad cells | Where |
+|---|---|---|
+| 1, 4 (4x1), 8 (8x1), 16 (8x2), 20 (4x5) | 0 | bitwise clean |
+| 32 (8x4) | 45,797 | three whole rank blocks: (x0,y1), (x2,y0), (x5,y3) |
+| 40 (8x5) | 37,129 | one block (x0,y2); same block in the 60-day run, so repeatable for a layout |
+| 40 (5x8) | 57,085 | different blocks |
+| 40 (10x4) | 61,725 | different blocks |
+**Finding:** the bad blocks move with the layout, and nearly every land cell inside a bad block is wrong (for example 1905 of 2083). All runs with 20 or fewer ranks are clean; all runs with 32 or 40 ranks have bad blocks. This is a parallel-path problem in the MPI LIS run (forcing or tile mapping on some ranks at high rank counts), not a data or physics issue, and not in JAX. Cause not yet found. Consequence: MPI timings at 32 and 40 ranks are valid wall-clock numbers, but those runs are not clean references; the clean 20-rank run (4x5) took 4:17 for 5 days vs 2:52 for the 40-rank run. Fair comparison on clean output: JAX vs MPI at 20 ranks (not yet run for 60 days). Next: run the 60-day case at 20 ranks (4x5) to get a clean MPI reference and timing.

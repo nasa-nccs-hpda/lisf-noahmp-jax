@@ -6,7 +6,7 @@ JAX ports of land surface models from NASA's Land Information System Framework (
 
 ## Status (2026-11-03)
 - Noah-MP 5.0 (the NCAR snapshot LIS 7.8 uses), 4.0.1, 3.6; Noah 3.x, Mosaic and CLSM F2.5 are ported. Details and open items: [docs/STATUS_20261022.md](docs/STATUS_20261022.md), [docs/ROADMAP.md](docs/ROADMAP.md) (running at-a-glance board).
-- Speed: Noah-MP 5.0, CONUS, 60 days: 255 s on one V100 vs about 43,900 s on one Fortran core (172x). Against 40-core MPI LIS (one node, 2,207 s) it is 8.7x; quote both. Tables: [docs/reports/BENCHMARKS.md](docs/reports/BENCHMARKS.md).
+- Speed: Noah-MP 5.0, CONUS, 60 days: 255 s on one V100 vs about 43,900 s on one Fortran core (172x). Against 20-core MPI LIS with bitwise-identical output (3,092 s) it is 12.1x; against 40 ranks (2,207 s, output not clean) 8.7x. Tables: [docs/reports/BENCHMARKS.md](docs/reports/BENCHMARKS.md).
 - Agreement (same run): p99 of JAX-minus-Fortran SWE 0.023 mm, soil temperature 0.021 K; single-tile maxima are larger (snow/freeze-thaw thresholds).
 
 ## Run

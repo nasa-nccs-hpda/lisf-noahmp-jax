@@ -1,6 +1,6 @@
 # Roadmap at a glance (running; newest work first)
 
-Last updated: 2026-11-04 (MPI vs serial agreement check added). Owner: G. Tamkin. Everything below is work from 2026-11-02 onward; earlier history is in `LOG.md`, `STATUS_20261022.md`, `Reports/BENCHMARKS.md`.
+Last updated: 2026-11-04 (clean 20-rank MPI baseline: 12.1x). Owner: G. Tamkin. Everything below is work from 2026-11-02 onward; earlier history is in `LOG.md`, `STATUS_20261022.md`, `Reports/BENCHMARKS.md`.
 
 ## Status board
 | # | Workstream | Status | Next step | Where |
@@ -17,7 +17,7 @@ Last updated: 2026-11-04 (MPI vs serial agreement check added). Owner: G. Tamkin
 | Pri | Step | Who | Done when |
 |---|---|---|---|
 | 1 | Send the customer the speed clarification (172x vs 1 core, 8.7x vs 40-core MPI); draft is in the chat history / item 1 | G. Tamkin | Sent |
-| 2 | MPI vs serial agreement: bad rank blocks at 32 and 40 ranks (move with layout); 20 ranks and fewer are bitwise clean | Assistant | Run 60 d at 20 ranks (4x5) for a clean MPI reference and timing; find the cause of the high-rank bad blocks |
+| 2 | MPI vs serial agreement: 20 ranks bitwise identical over 60 d (240 files); bad rank blocks only at 32 and 40 ranks | DONE for the baseline | Optional: find cause of the high-rank bad blocks (check block properties, ESMF/forcing read) |
 | 3 | Independent reproduction: owner or teammate runs the 48 tests and the 60 d CONUS case from `lisf-noahmp-jax` | Owner / teammate | One external run recorded (needs repo access, see 4) |
 | 4 | Repo housekeeping: freeze `jax-port`; give owner access to the private repo; pick a license; generate `uv.lock` (needs uv); fix old-path references in historical docs and slurm scripts | G. Tamkin (decisions), assistant (edits) | CI green on `main`; no `jax-port` paths in live docs |
 | 5 | NCAR/noahmp 5.2.1: apply dump hook to `dev/lisf_build_552`, run 5.2.1 LIS, replay, port the default-path fixes as a variant (MPVER=52) | Assistant | G1 replay and G3 closed loop pass for 5.2.1 |
@@ -33,7 +33,8 @@ Last updated: 2026-11-04 (MPI vs serial agreement check added). Owner: G. Tamkin
 | Run (Noah-MP 5.0 CONUS, 60 d) | Hardware | Wall time | JAX speed-up |
 |---|---|---|---|
 | Fortran, serial | 1 core | ~43,900 s (12.2 h) | 172x |
-| Fortran, MPI | 40 cores, 1 node | 2,207 s (36.8 min) | **8.7x** |
+| Fortran, MPI | 40 cores, 1 node | 2,207 s (36.8 min); output wrong in 2.7% of tiles | 8.7x |
+| Fortran, MPI | 20 cores (4x5) | 3,092 s (51.5 min); output bitwise identical to serial | **12.1x** |
 | JAX | 1 V100 | 255 s | 1x |
 
 MPI scaling, 5 days: 1 rank 55:31, 40 ranks 2:52 (19.4x), flattening above ~32 ranks. Details: `Reports/BENCHMARKS.md` (last section).
@@ -52,7 +53,7 @@ The maxima are single tiles at snow / freeze-thaw switches (float32 amplificatio
 
 ## 3. Credibility of the speed numbers
 - Fair points: one GPU vs one serial core; only one person has run it; best numbers are the long cases (range 2.4x to 172x).
-- Safe wording: "172x vs one CPU core and 8.7x vs a 40-core MPI run, one 60-day CONUS case, one V100." Always quote both.
+- Safe wording: "172x vs one CPU core and 8.7x vs a 40-core MPI run, one 60-day CONUS case, one V100." Always quote both. Fair claim vs verified parallel LIS: 12.1x (20 ranks, bitwise-clean output); 8.7x vs 40 ranks (output not clean).
 - Actions: item 1; ask the teammate or owner's side to reproduce the 60-day run and test suite (48 tests).
 
 ## 4. NCAR/noahmp 5.2.1

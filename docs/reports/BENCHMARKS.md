@@ -233,3 +233,13 @@ Metric: cells where forcing diagnostic Tair_f differs from serial Fortran by mor
 | 40 (5x8) | 57,085 | different blocks |
 | 40 (10x4) | 61,725 | different blocks |
 **Finding:** the bad blocks move with the layout, and nearly every land cell inside a bad block is wrong (for example 1905 of 2083). All runs with 20 or fewer ranks are clean; all runs with 32 or 40 ranks have bad blocks. This is a parallel-path problem in the MPI LIS run (forcing or tile mapping on some ranks at high rank counts), not a data or physics issue, and not in JAX. Cause not yet found. Consequence: MPI timings at 32 and 40 ranks are valid wall-clock numbers, but those runs are not clean references; the clean 20-rank run (4x5) took 4:17 for 5 days vs 2:52 for the 40-rank run. Fair comparison on clean output: JAX vs MPI at 20 ranks (not yet run for 60 days). Next: run the 60-day case at 20 ranks (4x5) to get a clean MPI reference and timing.
+
+### Clean MPI reference: 60 days at 20 ranks (4x5), job 37950803 (2026-11-04)
+Same case as above. Wall time **51:32 (3,092 s)**, exit 0, all 240 history files. Compared with serial Fortran (`cmp_mpi20_vs_serial_60d_20261104.txt`): **all 42 variables are 100% bitwise identical, max difference 0, in all 240 files.** So the MPI LIS itself is correct at 20 ranks; the bad blocks at 32 and 40 ranks are a high-rank-count problem of this MPI build, not of the model.
+| Run (Noah-MP 5.0 CONUS, 60 d) | Hardware | Wall time | Output vs serial | JAX speed-up |
+|---|---|---|---|---|
+| Fortran, serial | 1 core | about 43,900 s | reference | 172x |
+| Fortran, MPI 20 ranks (4x5) | 20 cores | 3,092 s | bitwise identical | **12.1x** |
+| Fortran, MPI 40 ranks (8x5) | 40 cores | 2,207 s | 2.7% of tiles wrong (one rank block) | 8.7x (timing only) |
+| JAX | 1 V100 | 255 s | p99 at float32 level (see above) | 1x |
+**Quote 12.1x as the fair speed claim against parallel Fortran with verified output; 172x only as against one core.** The 40-rank run is faster but its output is not trustworthy, so it should not be the baseline.

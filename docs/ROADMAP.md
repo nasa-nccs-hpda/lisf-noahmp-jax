@@ -11,7 +11,7 @@ Last updated: 2026-11-03 (three-way speed table added). Owner: G. Tamkin. Everyt
 | 4 | NCAR/noahmp 5.2.1 (fixes that change results first) | STARTED | Add dump hook to the 5.2.1 build, replay, port the default-path fixes | `projects/LISF/noahmp-ncar-jax/PLAN.md`, `dev/lisf_build_552/` |
 | 5 | Owner-meeting follow-up | DECK DONE | Decide repo access for the owner; chase the five asks | `status_slides/owner_meeting_20261102.pdf` |
 | 6 | Standard confidence-building protocol | DRAFT v0.1 | Owner review of gates/thresholds; add balance checks (G5) and configs into repo (G8) | `PORT_ASSURANCE.md` |
-| 7 | Refactor into `lisf-noahmp-jax` (dsg-template layout) | CREATED LOCALLY; parity test running | Full suite result in new layout; then create remote, freeze `jax-port`, continue work only in the new repo | `projects/LISF/lisf-noahmp-jax` |
+| 7 | Refactor into `lisf-noahmp-jax` (dsg-template layout) | DONE; 48 tests pass in new layout; pushed (private) | Freeze `jax-port` (no new work there), continue only here; decide license and `uv.lock`; give the owner access when agreed | https://github.com/nasa-nccs-hpda/lisf-noahmp-jax |
 
 ## 1. MPI baseline
 - Why: the 172x compares one V100 with one serial Fortran core. Real LIS runs on many cores; a fair claim is "N times faster than N cores".

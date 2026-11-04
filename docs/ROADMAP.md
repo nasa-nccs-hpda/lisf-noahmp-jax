@@ -1,17 +1,29 @@
 # Roadmap at a glance (running; newest work first)
 
-Last updated: 2026-11-03 (three-way speed table added). Owner: G. Tamkin. Everything below is work from 2026-11-02 onward; earlier history is in `LOG.md`, `STATUS_20261022.md`, `Reports/BENCHMARKS.md`.
+Last updated: 2026-11-03 (repo pushed; next steps added). Owner: G. Tamkin. Everything below is work from 2026-11-02 onward; earlier history is in `LOG.md`, `STATUS_20261022.md`, `Reports/BENCHMARKS.md`.
 
 ## Status board
 | # | Workstream | Status | Next step | Where |
 |---|---|---|---|---|
 | 1 | MPI baseline (fair speed comparison) | DONE | 60 d: serial 1 core 43,900 s; MPI 40 cores 2,207 s; JAX 1 V100 255 s. JAX is 172x vs 1 core, **8.7x vs 40 cores**. Customer told 172x on 2026-11-03: send the clarification | `lisf_run/conus_mp5_mpi/`, `gpu/gpu_conus_mp5_mpi_scaling.sbatch` |
 | 2 | Max differences for the client | DONE (table below) | Add a tile map of where the maxima sit, if asked | `Reports/cmp_conus_mp5_60d_fix1_20261025.txt` |
-| 3 | Teammate's "not believable" concern | REPLY DRAFTED | Send reply; run item 1; get an independent reproduction; reword claims | this file |
+| 3 | Teammate's "not believable" concern | ADDRESSED IN DOCS; follow-up to customer pending | Send the 172x / 8.7x clarification to the customer; get an independent reproduction | this file |
 | 4 | NCAR/noahmp 5.2.1 (fixes that change results first) | STARTED | Add dump hook to the 5.2.1 build, replay, port the default-path fixes | `projects/LISF/noahmp-ncar-jax/PLAN.md`, `dev/lisf_build_552/` |
 | 5 | Owner-meeting follow-up | DECK DONE | Decide repo access for the owner; chase the five asks | `status_slides/owner_meeting_20261102.pdf` |
 | 6 | Standard confidence-building protocol | DRAFT v0.1 | Owner review of gates/thresholds; add balance checks (G5) and configs into repo (G8) | `PORT_ASSURANCE.md` |
 | 7 | Refactor into `lisf-noahmp-jax` (dsg-template layout) | DONE; 48 tests pass in new layout; pushed (private) | Freeze `jax-port` (no new work there), continue only here; decide license and `uv.lock`; give the owner access when agreed | https://github.com/nasa-nccs-hpda/lisf-noahmp-jax |
+
+## Next steps (prioritized; updated 2026-11-03)
+| Pri | Step | Who | Done when |
+|---|---|---|---|
+| 1 | Send the customer the speed clarification (172x vs 1 core, 8.7x vs 40-core MPI); draft is in the chat history / item 1 | G. Tamkin | Sent |
+| 2 | Check that the 40-rank MPI output matches serial Fortran (speed table currently has no agreement check for MPI) | Assistant | Compare job 37950501 history to the serial 60 d run; result in BENCHMARKS |
+| 3 | Independent reproduction: owner or teammate runs the 48 tests and the 60 d CONUS case from `lisf-noahmp-jax` | Owner / teammate | One external run recorded (needs repo access, see 4) |
+| 4 | Repo housekeeping: freeze `jax-port`; give owner access to the private repo; pick a license; generate `uv.lock` (needs uv); fix old-path references in historical docs and slurm scripts | G. Tamkin (decisions), assistant (edits) | CI green on `main`; no `jax-port` paths in live docs |
+| 5 | NCAR/noahmp 5.2.1: apply dump hook to `dev/lisf_build_552`, run 5.2.1 LIS, replay, port the default-path fixes as a variant (MPVER=52) | Assistant | G1 replay and G3 closed loop pass for 5.2.1 |
+| 6 | Port assurance v0.2: owner review of gates and thresholds; add balance checks (G5) and configs (G8) | Owner + assistant | Level 1 ratification of the 5.0 port |
+| 7 | Known gap: 148 CONUS water-soil tiles unstable in warm season (input data); warm-season cases beyond Feb-Jul 2017 | Assistant | Fix or documented mask; one summer case validated |
+| 8 | Larger MPI baseline (multi-node) if customers ask for a bigger-core comparison | Assistant | Time at 80+ ranks recorded |
 
 ## 1. MPI baseline
 - Why: the 172x compares one V100 with one serial Fortran core. Real LIS runs on many cores; a fair claim is "N times faster than N cores".

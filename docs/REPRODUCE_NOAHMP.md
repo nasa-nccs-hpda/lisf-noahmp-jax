@@ -1,7 +1,7 @@
 # Reproducing one Noah-MP result from scratch (2026-10-24)
 
 Owner: G. Tamkin. Written by a Claude Code session. Project-local. Status: DRAFT, not yet followed by a second person (that is the point of this page).
-Purpose: let someone other than the author check one claim end to end: **Noah-MP 4.0.1, Southern Great Plains (27x22 cells, 0.25 deg), NLDAS-2 forcing, 2017-01-01 to 2018-01-01, JAX on a V100 is about 8-10x faster than the serial Fortran LIS and agrees with it** (STATUS_20261022.md, Reports/BENCHMARKS.md). Total effort: about 1.5 h of machine time, most of it the Fortran run.
+Purpose: let someone other than the author check one claim end to end: **Noah-MP 4.0.1, Southern Great Plains (27x22 cells, 0.25 deg), NLDAS-2 forcing, 2017-01-01 to 2018-01-01, JAX on a V100 is about 8-10x faster than the serial Fortran LIS and agrees with it** (STATUS_20261022.md, docs/reports/BENCHMARKS.md). Total effort: about 1.5 h of machine time, most of it the Fortran run.
 
 ## 0. What you need (all outside the repository; paths of the author's account, group `ilab`)
 | Item | Where |
@@ -58,7 +58,7 @@ The comparison reports p99 (not the maximum): a few freeze/thaw and wet-canopy t
 * Fortran run not finishing or a different wall time by more than 2x (different node type): compare only same-node pairs.
 
 ## 7. Shorter checks (minutes)
-* `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 JAX_PLATFORMS=cpu python3 -m pytest -q tests` (about 31 min, 30 tests; `-k "not option"` about 4 min) replays recorded Fortran calls; `tests/test_ldt.py` needs the raw LDT data and is skipped without it.
+* `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 JAX_PLATFORMS=cpu python3 -m pytest -q tests` (48 tests, 28-52 min, see tests/README.md; `-k "not option"` about 4 min) replays recorded Fortran calls; `tests/test_ldt.py` needs the raw LDT data and is skipped without it.
 * Restart round trip (about 5 min CPU): LOG.md 2026-10-24 ~03:00.
 
 ## 8. The same check for Noah-MP 5.0 (added 2026-10-24; DRAFT, not followed by a second person)
@@ -66,6 +66,12 @@ Claim: **Noah-MP 5.0, SGP, 2017 full year, JAX on a V100 is about 10x faster tha
 * Parameter file: the real LDT output is in `$LISF_RUN/ldt_mp5/out/lis_input.sgp.noahmp5.nc` (Noah-MP 5.0 uses the same LDT parameters as 4.0.1 plus the table `NoahmpTable.TBL`, which LIS reads itself).
 * Configs: `$LISF_RUN/mp5_sgp_year/lis.config.fort` and `lis.config.jax` (from `lis.config.mp5`, period 2017-01-01 to 2018-01-01, output `./fort` / `./jax`, 6-hourly history).
 * Run both with `sbatch scripts/slurm/gpu_bench_mp5_sgp_year.sbatch` (Fortran about 49 min on one core, JAX about 5 min), then `PYTHONPATH=<repo>/src python3 -m lisf_noahmp_jax.driver.compare_hist $LISF_RUN/mp5_sgp_year/fort $LISF_RUN/mp5_sgp_year/jax`.
-* Expected: 1,460 files; SoilMoist p99 about 6.6e-4, SoilTemp p99 about 4.4e-2 K (larger than 4.0.1 because of snow-onset chaos in January, see `Reports/BENCHMARKS.md`), SWE p99 3.4e-5; no 'NaN only in the new run' for model fields. The 5.0 history list of the testcase holds states only (no Qle/Qh/Qg).
-* CONUS 1 day: `sbatch gpu/gpu_bench_conus_mp5.sbatch` (Fortran 663 s, JAX 95 s), restart round trip: `sbatch gpu/gpu_rt_conus_mp5.sbatch`.
-* Open-loop check of the physics: `MPVER=50 python3 lis/replay_mp50.py <dump dir> 40000` (land) and `GLA=50 python3 lis/replay_gla50.py <dump dir>` (land ice); the dump needs `LIS_mp50_dump` (built with `lis_patches/make_noahmp50_hook.py`).
+* Expected: 1,460 files; SoilMoist p99 about 6.6e-4, SoilTemp p99 about 4.4e-2 K (larger than 4.0.1 because of snow-onset chaos in January, see `docs/reports/BENCHMARKS.md`), SWE p99 3.4e-5; no 'NaN only in the new run' for model fields. The 5.0 history list of the testcase holds states only (no Qle/Qh/Qg).
+* CONUS 1 day: `sbatch scripts/slurm/gpu_bench_conus_mp5.sbatch` (Fortran 663 s, JAX 95 s), restart round trip: `sbatch scripts/slurm/gpu_rt_conus_mp5.sbatch`.
+* Open-loop check of the physics: `MPVER=50 python3 tools/replay/replay_mp50.py <dump dir> 40000` (land) and `GLA=50 python3 tools/replay/replay_gla50.py <dump dir>` (land ice); the dump needs `LIS_mp50_dump` (built with `lis_patches/make_noahmp50_hook.py`).
+
+
+## Notes from the independent review (2026-11-05)
+- To match the stored hourly Fortran output of the 1-day CONUS case, run the JAX driver with `--hours 1`; the default is 6.
+- `-C` must be the case directory that holds `INPUT/` and the LDT file.
+- Expect a divide-by-zero warning from water tiles in older versions; it is harmless and now masked.

@@ -256,3 +256,9 @@ Same case as above. Wall time **51:32 (3,092 s)**, exit 0, all 240 history files
 - The repeat runs give different results for the same layout, so the earlier statement "deterministic per layout" was too strong. Bad blocks at one time step (Tair_f, Feb 3 06Z): 8x5 original (0,2); 8x5 repeat (0,2) and (2,0); 8x4 original (0,1), (2,0), (5,3); 8x4 repeat (0,2). The same two areas recur: columns 0-57 / rows about 90-167 (northern California to Nevada area) and columns 116-173 / rows 0-55 (southern border area).
 - Reading: an initialisation problem that varies between runs (uninitialised memory or a race in start-up arrays such as the neighbor-interpolation index), plus something data-dependent that favours some areas. The error then persists for the whole run.
 - Next, decisive: build the MPI LIS with `-O0 -g -fcheck=all -finit-real=snan -ffpe-trap=invalid` and run 32 ranks for one day; it should stop at the line that uses an uninitialised value. Needs a rebuild of the MPI LIS (`dev/lisf_build_mpi`).
+
+### Fairness caveats added after the independent review (2026-11-05)
+- The serial Fortran 60-day job ran with `--cpus-per-task=2` and no `--exclusive`; the JAX job was exclusive on a V100 node and used 8 host cores for the forcing readers (139 of 255 s is forcing). Repeats: one run per configuration.
+- The "1 core" baseline differs by about 9% between builds: serial LIS 732 s per simulated day, the 1-rank MPI build 666 s per day (5-day n1 run). Against the MPI-build speed the single-core ratio would be about 156x, not 172x.
+- JAX time includes about 90 s compile in a cold 60-day run. Steady state per simulated day: 2.7 s (JAX) vs 51.5 s (20 ranks) = about 19x, vs 36.8 s (40 ranks) = about 14x.
+- Not normalised for cost (a 20-rank job is half a node; the JAX job holds a whole exclusive GPU node), I/O contention, or compiler (gfortran -O2, not Intel).

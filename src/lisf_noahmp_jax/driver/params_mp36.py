@@ -45,7 +45,8 @@ class SetupMP36(SetupMP):
         P = lambda p: p if p.startswith("/") else f"{base_dir}/{p}"
         self.nc_path = P(c.s("LIS domain and parameter data file"))
         self.model = c.s("Land surface model")
-        assert self.model == "NoahMP.3.6", f"unsupported land surface model {self.model}"
+        if not (self.model == "NoahMP.3.6"):
+            raise ValueError(f"unsupported land surface model {self.model}")
         M = "Noah-MP.3.6"
         self.v36mp = True
         self.o = {k: c.i(f"{M} {t}") for k, t in OPTKEYS}
@@ -54,7 +55,8 @@ class SetupMP36(SetupMP):
         supported = dict(dveg=(1, 3, 4), crs=(1, 2), btr=(1, 2, 3), run=(1, 2, 3, 4), sfc=(1, 2), frz=(1, 2), inf=(1, 2), rad=(1, 2, 3),
                          alb=(1, 2), snf=(1, 2, 3), tbot=(1, 2), stc=(1, 2))
         for k, ok in supported.items():
-            assert o[k] in ok, f"Noah-MP 3.6 option {k}={o[k]} not ported (supported: {ok})"
+            if not (o[k] in ok):
+                raise ValueError(f"Noah-MP 3.6 option {k}={o[k]} not ported (supported: {ok})")
         assert c.i(f"{M} soil color index") == 4 and c.i(f"{M} CZIL option (iz0tlnd)") == 0
         self.nslay = c.i(f"{M} number of soil layers")
         assert self.nslay == 4
@@ -87,7 +89,8 @@ class SetupMP36(SetupMP):
         self.i36["stc"] = c.fl(f"{M} initial soil temperatures")
         self.i36["smc"] = c.fl(f"{M} initial total soil moistures")
         self.i36["sh2o"] = c.fl(f"{M} initial liquid soil moistures")
-        assert self.i36["sneqv"] == 0.0 and self.i36["snowh"] == 0.0, "coldstart with initial snow not ported"
+        if not (self.i36["sneqv"] == 0.0 and self.i36["snowh"] == 0.0):
+            raise ValueError("coldstart with initial snow not ported")
         self.build_tiles()
 
     def build_tiles(self):

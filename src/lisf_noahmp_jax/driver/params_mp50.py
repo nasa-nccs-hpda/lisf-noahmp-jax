@@ -135,24 +135,28 @@ class SetupMP50(SetupMP):
         P = lambda p: p if p.startswith("/") else f"{base_dir}/{p}"
         self.nc_path = P(c.s("LIS domain and parameter data file"))
         self.model = c.s("Land surface model")
-        assert self.model == "Noah-MP.5.0", f"unsupported land surface model {self.model}"
+        if not (self.model == "Noah-MP.5.0"):
+            raise ValueError(f"unsupported land surface model {self.model}")
         M = "Noah-MP.5.0"
         self.o = {k: c.i(f"{M} {t}") for k, t in OPTKEYS}
         o = self.o
-        assert o["runsrf"] == o["runsub"] or (o["runsrf"] in (6, 7, 8) and o["runsub"] in (3, 6, 7, 8)), "this combination of surface and subsurface runoff options is not ported"
+        if not (o["runsrf"] == o["runsub"] or (o["runsrf"] in (6, 7, 8) and o["runsub"] in (3, 6, 7, 8))):
+            raise ValueError("this combination of surface and subsurface runoff options is not ported")
         o["run"] = o["runsrf"]
         supported = dict(dveg=(1, 2, 3, 4, 5, 6, 7, 8, 9), crs=(1, 2), btr=(1, 2, 3), run=(1, 2, 3, 4, 6, 7, 8), sfc=(1, 2), frz=(1, 2), inf=(1, 2), rad=(1, 2, 3),
                          alb=(1, 2), snf=(1, 2, 3, 5), tksno=(1, 2, 3, 4, 5), tbot=(1, 2), stc=(1, 2, 3), rsf=(1, 2, 3, 4), soil=(1,),
                          crop=(0, 1), irr=(0,), tdrn=(0, 1, 2), urban=(0,))
         for k, ok in supported.items():
-            assert o[k] in ok, f"Noah-MP 5.0 option {k}={o[k]} not ported (supported: {ok})"
+            if not (o[k] in ok):
+                raise ValueError(f"Noah-MP 5.0 option {k}={o[k]} not ported (supported: {ok})")
         self.nslay = c.i(f"{M} number of soil layers")
         assert self.nslay == 4
         self.sldpth = np.array(c.fl(f"{M} thickness of soil layers"), f32)
         ts = c.s(f"{M} model timestep")
         self.dt = int(ts.rstrip("mnMN")) * 60 if ts.lower().endswith("mn") else (int(ts[:-2]) * 3600 if ts.lower().endswith("hr") else int(ts))
         tss = c.s(f"{M} soil timestep")
-        assert (int(tss.rstrip("mnMN")) * 60 if tss.lower().endswith("mn") else int(tss)) == self.dt, "soil timestep different from the model timestep is not ported"
+        if not ((int(tss.rstrip("mnMN")) * 60 if tss.lower().endswith("mn") else int(tss)) == self.dt):
+            raise ValueError("soil timestep different from the model timestep is not ported")
         self.zref = c.f(f"{M} reference height of temperature and humidity")
         self.dz8w = f32(self.zref) * f32(2.0)
         d = nc.Dataset(self.nc_path)
@@ -171,14 +175,16 @@ class SetupMP50(SetupMP):
                          canwat=c.f(f"{M} initial total canopy surface water"), lai=c.f(f"{M} initial leaf area index"),
                          zwt=c.f(f"{M} initial water table depth"), wa=c.f(f"{M} initial water in the aquifer"),
                          wt=c.f(f"{M} initial water in aquifer and saturated soil"))
-        assert self.init["sneqv"] == 0.0 and self.init["snowh"] == 0.0, "coldstart with initial snow not ported"
+        if not (self.init["sneqv"] == 0.0 and self.init["snowh"] == 0.0):
+            raise ValueError("coldstart with initial snow not ported")
         self.dx = f32(c.f(f"{M} domain resolution dx"))
         self.crop_maps = None
         self.build_tiles()
         self.td_fraction = None
         if self.o.get("crop", 0) > 0:                                  # LDT variables PLANTING, HARVEST, SEASON_GDD (NoahMP50_setup)
             dd = nc.Dataset(self.nc_path)
-            assert getattr(dd, "CROPCLASS", 0) == 0, "LDT global attribute CROPCLASS > 0 (whole domain forced to one crop) is not ported"
+            if not (getattr(dd, "CROPCLASS", 0) == 0):
+                raise ValueError("LDT global attribute CROPCLASS > 0 (whole domain forced to one crop) is not ported")
             if (self.croptype > 0).any():
                 self.crop_maps = tuple(np.array(dd[k][:])[self.rows, self.cols].astype(f32) for k in ("PLANTING", "HARVEST", "SEASON_GDD"))
                 self.build_param()
@@ -228,7 +234,8 @@ class SetupMP50(SetupMP):
         P["SMCMAX"] = np.where(u, f32(0.45), P["SMCMAX"]); P["SMCREF"] = np.where(u, f32(0.42), P["SMCREF"])
         P["SMCWLT"] = np.where(u, f32(0.40), P["SMCWLT"]); P["SMCDRY"] = np.where(u, f32(0.40), P["SMCDRY"])
         P["CSOIL"] = np.where(urb, f32(3.0e6), P["CSOIL"])
-        frzfact = (P["SMCMAX"][:, 0] / P["SMCREF"][:, 0]) * f32(0.412 / 0.468)
+        with np.errstate(divide="ignore", invalid="ignore"):   # water tiles have SMCREF = 0; FRZX is set to 0 for them below
+            frzfact = (P["SMCMAX"][:, 0] / P["SMCREF"][:, 0]) * f32(0.412 / 0.468)
         P["FRZX"] = np.where(self.soiltyp != 14, P["FRZK"] * frzfact, f32(0.0)).astype(f32)
         P["MXSNALB"], P["MNSNALB"], P["sndecayexp"] = one(0.84), one(0.55), one(0.01)
         P["T_ulimit"], P["T_mlimit"], P["T_llimit"], P["snowf_scalef"] = one(2.5), one(2.0), one(0.5), one(1.0)

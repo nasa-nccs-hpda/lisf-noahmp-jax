@@ -2,7 +2,7 @@
 
 JAX ports of land surface models from NASA's Land Information System Framework (LISF, Fortran), with the Noah-MP family (3.6, 4.0.1, 5.0) first. Each port is checked against the real Fortran LIS (GNU 14, serial) on the same inputs. A research prototype, not a replacement for LIS.
 
-**What it is not:** not all of LIS (single-process JAX, no MPI; no LDT/LVT beyond what Noah-MP needs, two forcings, no VIC/CLM2/RUC/JULES). Not independently reproduced or reviewed by the model owners yet (see [docs/PORT_ASSURANCE.md](docs/PORT_ASSURANCE.md)).
+**What it is not:** not all of LIS (single-process JAX, no MPI; no LDT/LVT beyond what Noah-MP needs, two forcings, no VIC/CLM2/RUC/JULES). Not independently reproduced or reviewed by the model owners yet (see [docs/PORT_ASSURANCE.md](docs/PORT_ASSURANCE.md)). Also: Noah-MP 5.0 is compared with Fortran in closed loop on state variables only (fluxes only in one-step replay); 148 CONUS water-soil tiles are unstable in the warm season in both models and are masked; the MPI LIS used as speed baseline gives wrong output at 32 or more ranks (20 ranks is clean). The independent review (`docs/reports/independent_test_20261105.md`) rates the port Level 1 for the named cases only.
 
 ## Status (2026-11-03)
 - Noah-MP 5.0 (the NCAR snapshot LIS 7.8 uses), 4.0.1, 3.6; Noah 3.x, Mosaic and CLSM F2.5 are ported. Details and open items: [docs/STATUS_20261022.md](docs/STATUS_20261022.md), [docs/ROADMAP.md](docs/ROADMAP.md) (running at-a-glance board).
@@ -10,14 +10,14 @@ JAX ports of land surface models from NASA's Land Information System Framework (
 - Agreement (same run): p99 of JAX-minus-Fortran SWE 0.023 mm, soil temperature 0.021 K; single-tile maxima are larger (snow/freeze-thaw thresholds).
 
 ## Run
-The validated environment is Python 3.10 with JAX 0.5.3, numpy and netCDF4 (the `graphcast-env` conda environment on the NCCS cluster). With uv: `uv sync --locked` then `uv run --locked lisf-noahmp-jax -C CASE_DIR CASE_DIR/lis.config.jax`. Without uv: `pip install -e .` or `PYTHONPATH=src`.
+The validated environment is Python 3.10 with JAX 0.5.3, numpy and netCDF4 (the `graphcast-env` conda environment on the NCCS cluster). With pip: `pip install ".[test]"` then `lisf-noahmp-jax -C CASE_DIR CASE_DIR/lis.config.jax`. or `PYTHONPATH=src`.
 
 ```bash
-PYTHONPATH=src python -m lisf_noahmp_jax.cli -C CASE_DIR CASE_DIR/lis.config.jax     # run from a LIS-style config
+PYTHONPATH=src python -m lisf_noahmp_jax.cli -C CASE_DIR CASE_DIR/lis.config.jax     # run from a LIS-style config; add --hours 1 to write hourly history files (default 6, the config's output interval is ignored)
 PYTHONPATH=src python -m lisf_noahmp_jax.driver.compare_hist FORTRAN_OUT JAX_OUT      # per-variable p50/p99/max vs the Fortran output
-PYTHONPATH=src python -m pytest tests -q                                              # 48 tests, about 30 min on one CPU core
+PYTHONPATH=src python -m pytest tests -q                                              # 48 tests, 28-52 min on one CPU core (see tests/README.md)
 ```
-Run data, forcing and the Fortran build are outside the repository: [docs/DATA_AND_PATHS.md](docs/DATA_AND_PATHS.md), [docs/REPRODUCE_NOAHMP.md](docs/REPRODUCE_NOAHMP.md).
+Environment variables: `JAX_PLATFORMS=cpu` (force CPU), `LISJAX_FORCING_PROCS` (forcing reader processes), `LISJAX_ULP_TAIR=1` (move air temperature one float32 ulp, for the noise-floor test). Skipped tests print their reason with `pytest -rs`. Run data, forcing and the Fortran build are outside the repository: [docs/DATA_AND_PATHS.md](docs/DATA_AND_PATHS.md), [docs/REPRODUCE_NOAHMP.md](docs/REPRODUCE_NOAHMP.md).
 
 ## Layout
 | Path | Purpose |

@@ -42,7 +42,8 @@ class HyMAP2Params:
         nxt = np.zeros(n, np.int64)
         m0 = self.outlet == 0
         nxt[m0] = sindex[nexty[rr, cc][m0] - 1, nx_[m0] - 1]
-        assert (nxt[m0] >= 0).all(), "downstream cell outside the routing sequence"
+        if not ((nxt[m0] >= 0).all()):
+            raise ValueError("downstream cell outside the routing sequence")
         self.next = nxt
         v = lambda k: g(k)[rr, cc].astype(f32)
         self.rivwth, self.rivlen, self.rivhgt, self.rivman = v("HYMAP_river_width"), v("HYMAP_river_length"), \
@@ -60,7 +61,8 @@ class HyMAP2Params:
         tb = v("HYMAP_baseflow_time_delay")
         self.tbsflw = np.where((tb < self.cntime / f32(86400.0)) & (self.cntime > 0), self.cntime / f32(86400.0), tb).astype(f32)
         for k in ("rivwth", "rivlen", "rivhgt", "rivman", "fldman", "elevtn", "nxtdst", "grarea", "cntime", "trnoff", "tbsflw"):
-            assert (getattr(self, k) != MIS).all(), f"missing values in {k}"
+            if not ((getattr(self, k) != MIS).all()):
+                raise ValueError(f"missing values in {k}")
         assert (self.fldhgt != MIS).all()
         self.nz = nz
         # derived (HYMAP2_routingInit / HYMAP2_set_fldstg)
@@ -90,13 +92,18 @@ class HyMAP2Params:
 
 def hymap2_config(cfg, parse_interval):
     c = cfg
-    assert c.s("Routing model") == "HYMAP2 router", c.s("Routing model")
+    if not (c.s("Routing model") == "HYMAP2 router"):
+        raise ValueError(c.s("Routing model"))
     assert c.i("HYMAP2 run in ensemble mode") == 0
-    assert c.s("HYMAP2 routing model evaporation option").lower() in ("none", "0"), "evaporation not ported"
-    assert c.i("HYMAP2 routing model dwi flag") == 0, "deep water infiltration not ported"
-    assert c.i("HYMAP2 reservoir operation option") == 0, "reservoir operation not ported"
+    if not (c.s("HYMAP2 routing model evaporation option").lower() in ("none", "0")):
+        raise ValueError("evaporation not ported")
+    if not (c.i("HYMAP2 routing model dwi flag") == 0):
+        raise ValueError("deep water infiltration not ported")
+    if not (c.i("HYMAP2 reservoir operation option") == 0):
+        raise ValueError("reservoir operation not ported")
     assert c.i("HYMAP2 enable 2-way coupling") == 0 if "HYMAP2 enable 2-way coupling" in c.d else True
-    assert c.s("HYMAP2 routing method") in ("kinematic", "diffusive", "local inertia"), c.s("HYMAP2 routing method")
+    if not (c.s("HYMAP2 routing method") in ("kinematic", "diffusive", "local inertia")):
+        raise ValueError(c.s("HYMAP2 routing method"))
     return dict(dt=f32(parse_interval(c.s("HYMAP2 routing model time step"))), method=c.s("HYMAP2 routing method"),
                 steptype=c.s("HYMAP2 routing model time step method"),
                 cadp=c.f("HYMAP2 routing model adaptive time step alfa coefficient")

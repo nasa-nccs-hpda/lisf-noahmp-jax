@@ -27,14 +27,16 @@ class SetupMP:
         P = lambda p: p if p.startswith("/") else f"{base_dir}/{p}"
         self.nc_path = P(c.s("LIS domain and parameter data file"))
         self.model = c.s("Land surface model")
-        assert self.model == "Noah-MP.4.0.1", f"unsupported land surface model {self.model}"
+        if not (self.model == "Noah-MP.4.0.1"):
+            raise ValueError(f"unsupported land surface model {self.model}")
         M = "Noah-MP.4.0.1"
         self.o = {k: c.i(f"{M} {t}") for k, t in OPTKEYS}
         o = self.o
         supported = dict(dveg=(1, 3, 4), crs=(1, 2), btr=(1, 2, 3), run=(1, 2, 3, 4), sfc=(1, 2), frz=(1, 2), inf=(1, 2), rad=(1, 2, 3),
                          alb=(1, 2), snf=(1, 2, 3), tbot=(1, 2), stc=(1, 2, 3), rsf=(1, 2, 3, 4), soil=(1,), crop=(0,), urban=(0,))
         for k, ok in supported.items():
-            assert o[k] in ok, f"Noah-MP option {k}={o[k]} not ported (supported: {ok})"
+            if not (o[k] in ok):
+                raise ValueError(f"Noah-MP option {k}={o[k]} not ported (supported: {ok})")
         self.nslay = c.i(f"{M} number of soil layers")
         assert self.nslay == 4
         self.sldpth = np.array(c.fl(f"{M} thickness of soil layers"), f32)
@@ -55,7 +57,8 @@ class SetupMP:
                          canwat=c.f(f"{M} initial total canopy surface water"), lai=c.f(f"{M} initial leaf area index"),
                          zwt=c.f(f"{M} initial water table depth"), wa=c.f(f"{M} initial water in the aquifer"),
                          wt=c.f(f"{M} initial water in aquifer and saturated soil"))
-        assert self.init["sneqv"] == 0.0 and self.init["snowh"] == 0.0, "coldstart with initial snow not ported"
+        if not (self.init["sneqv"] == 0.0 and self.init["snowh"] == 0.0):
+            raise ValueError("coldstart with initial snow not ported")
         self.build_tiles()
 
     def build_tiles(self):

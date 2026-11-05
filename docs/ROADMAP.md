@@ -1,13 +1,13 @@
 # Roadmap at a glance (running; newest work first)
 
-Last updated: 2026-11-04 (clean 20-rank MPI baseline: 12.1x). Owner: G. Tamkin. Everything below is work from 2026-11-02 onward; earlier history is in `LOG.md`, `STATUS_20261022.md`, `Reports/BENCHMARKS.md`.
+Last updated: 2026-11-05 (independent review done; MPI bug is optimisation-dependent). Owner: G. Tamkin. Everything below is work from 2026-11-02 onward; earlier history is in `LOG.md`, `STATUS_20261022.md`, `Reports/BENCHMARKS.md`.
 
 ## Status board
 | # | Workstream | Status | Next step | Where |
 |---|---|---|---|---|
 | 1 | MPI baseline (fair speed comparison) | DONE | 60 d: serial 1 core 43,900 s; MPI 40 cores 2,207 s; JAX 1 V100 255 s. JAX is 172x vs 1 core, **8.7x vs 40 cores**. Customer told 172x on 2026-11-03: send the clarification | `lisf_run/conus_mp5_mpi/`, `gpu/gpu_conus_mp5_mpi_scaling.sbatch` |
 | 2 | Max differences for the client | DONE (table below) | Add a tile map of where the maxima sit, if asked | `Reports/cmp_conus_mp5_60d_fix1_20261025.txt` |
-| 3 | Teammate's "not believable" concern | ADDRESSED IN DOCS; follow-up to customer pending | Send the 172x / 8.7x clarification to the customer; get an independent reproduction | this file |
+| 3 | Independent reproduction | SIMULATED TESTER DONE 2026-11-05: accept with conditions (Level 1 for named cases) | Fix the conditions below; then a human run (owner/teammate) using the same task list; Discover run still to do | `docs/reports/independent_test_20261105.md` |
 | 4 | NCAR/noahmp 5.2.1 (fixes that change results first) | STARTED | Add dump hook to the 5.2.1 build, replay, port the default-path fixes | `projects/LISF/noahmp-ncar-jax/PLAN.md`, `dev/lisf_build_552/` |
 | 5 | Owner-meeting follow-up | DECK DONE | Decide repo access for the owner; chase the five asks | `status_slides/owner_meeting_20261102.pdf` |
 | 6 | Standard confidence-building protocol | DRAFT v0.1 | Owner review of gates/thresholds; add balance checks (G5) and configs into repo (G8) | `PORT_ASSURANCE.md` |
@@ -24,6 +24,10 @@ Last updated: 2026-11-04 (clean 20-rank MPI baseline: 12.1x). Owner: G. Tamkin. 
 | 6 | Port assurance v0.2: owner review of gates and thresholds; add balance checks (G5) and configs (G8) | Owner + assistant | Level 1 ratification of the 5.0 port |
 | 7 | Known gap: 148 CONUS water-soil tiles unstable in warm season (input data); warm-season cases beyond Feb-Jul 2017 | Assistant | Fix or documented mask; one summer case validated |
 | 8 | Larger MPI baseline (multi-node) if customers ask for a bigger-core comparison | Assistant | Time at 80+ ranks recorded |
+| 9 | Close the test gaps found by the independent review: 4 of 9 mutations of `noahmp50_jax.py` pass all tests (snow-layer release, snow liquid fraction, ice conductivity +4.5%, latent heat -0.4%) | Assistant | Add a committed deep-snow / frozen-soil replay (Mar 1 restart case) and per-variable limits near float32 noise; the 4 mutations must then fail |
+| 10 | 5.0 closed-loop flux comparison (Qle/Qh/Qg, energy balance) against Fortran; pre-registered numeric thresholds; ensemble noise floor | Assistant | Fortran 5.0 reference with flux output; conditional p99 on snow/frozen tiles |
+| 11 | Provenance (G8): `uv.lock` (needs uv), configs and a small public dataset with reference outputs in or beside the repo, CI running a fast replay subset | G. Tamkin / assistant | `uv sync --locked` works; CI green; a newcomer can run one case without `/panfs` |
+| 12 | MPI bad blocks at 32+ ranks: -O0 build is clean, -O2 (with NaN init) is bad; testing -O2 without vectorisation | Assistant | Identify the optimisation or code defect; report to the LIS team if it is theirs |
 
 ## 1. MPI baseline
 - Why: the 172x compares one V100 with one serial Fortran core. Real LIS runs on many cores; a fair claim is "N times faster than N cores".

@@ -262,3 +262,17 @@ Same case as above. Wall time **51:32 (3,092 s)**, exit 0, all 240 history files
 - The "1 core" baseline differs by about 9% between builds: serial LIS 732 s per simulated day, the 1-rank MPI build 666 s per day (5-day n1 run). Against the MPI-build speed the single-core ratio would be about 156x, not 172x.
 - JAX time includes about 90 s compile in a cold 60-day run. Steady state per simulated day: 2.7 s (JAX) vs 51.5 s (20 ranks) = about 19x, vs 36.8 s (40 ranks) = about 14x.
 - Not normalised for cost (a 20-rank job is half a node; the JAX job holds a whole exclusive GPU node), I/O contention, or compiler (gfortran -O2, not Intel).
+
+### MPI bad blocks: compiler-flag experiments (2026-11-05)
+All runs: Noah-MP 5.0 CONUS, 5 simulated days, 20 history files, 32 and 40 ranks; metric = Tair_f cells differing from serial Fortran by more than 0.01 K (sum over files). Same source and config in every build; only FFLAGS differ. Scripts `scripts/slurm/gpu_conus_mp5_mpi_{debug,debug_notrap,debug_5d,o2snan_5d,novec_5d}.sbatch`.
+| Build | 32 ranks | 40 ranks | Note |
+|---|---|---|---|
+| -O2 (the production MPI build) | 45,797 | 37,129 | bad blocks |
+| -O2, repeat runs of the same binary | 54,625 | 32,771 | different blocks each run: not deterministic |
+| -O0 -g -finit-real=snan -finit-integer=-99999 -fcheck=bounds, no FP trap | **0** | **0** | clean for 1 and 5 days; no bounds error and no NaN anywhere |
+| -O0 with -ffpe-trap=invalid | stops in 5 s | stops in 4 s | SIGFPE in Noah-MP `SurfaceEnergyFluxBareGround` on the ranks that print "SOIL TYPE FOUND TO BE WATER" (the known water-soil tiles); unrelated to the bad blocks |
+| -O2 -finit-real=snan -finit-integer=-99999 | 41,384 | 36,182 | still bad: not an uninitialised stack variable |
+| -O2 -fno-tree-vectorize -fno-tree-slp-vectorize | 38,910 | 37,662 | still bad: not vectorisation |
+Per output step the number of bad cells changes (for example 3,248, 6,168, 1,402, ... 0 over the first 8 files), and the bad cells are present from the first history file. So whole rank blocks receive wrong forcing at some forcing reads and not others; this is not a fixed start-up mapping error.
+Reading: the bug needs optimisation (-O1/-O2 code or the timing it produces), is not deterministic, is not an uninitialised stack variable or vectorisation, and -fcheck=bounds finds no out-of-bounds access in the executed code at -O0. Remaining suspects: a data race or message-ordering problem in the parallel forcing path that only shows with fast ranks, an uninitialised heap (ALLOCATE) array, or an optimiser-exposed invalid-Fortran construct. Next probes: -O1; -O2 with `-fno-strict-aliasing`/`-fno-inline`; running the -O2 binary under valgrind or with a different MPICH progress setting; compare the forcing arrays on a bad rank directly (print `metdata2` checksums per forcing read).
+Practical consequence: the 20-rank -O2 baseline is clean in all tests (60 days bitwise identical); results at 32 or more ranks with the optimised build must not be used. An -O0 build is clean at 40 ranks but about 1.5x slower (5 days: 4:22 vs 2:57).

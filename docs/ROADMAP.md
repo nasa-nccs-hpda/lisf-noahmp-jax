@@ -27,7 +27,7 @@ Last updated: 2026-11-05 (independent review done; MPI bug is optimisation-depen
 | 9 | Close the test gaps found by the independent review: 4 of 9 mutations of `noahmp50_jax.py` pass all tests (snow-layer release, snow liquid fraction, ice conductivity +4.5%, latent heat -0.4%) | Assistant | Add a committed deep-snow / frozen-soil replay (Mar 1 restart case) and per-variable limits near float32 noise; the 4 mutations must then fail |
 | 10 | 5.0 closed-loop flux comparison (Qle/Qh/Qg, energy balance) against Fortran; pre-registered numeric thresholds; ensemble noise floor | Assistant | Fortran 5.0 reference with flux output; conditional p99 on snow/frozen tiles |
 | 11 | Provenance (G8): `uv.lock` (needs uv), configs and a small public dataset with reference outputs in or beside the repo, CI running a fast replay subset | G. Tamkin / assistant | `uv sync --locked` works; CI green; a newcomer can run one case without `/panfs` |
-| 12 | MPI bad blocks at 32+ ranks: -O0 build is clean, -O2 (with NaN init) is bad; testing -O2 without vectorisation | Assistant | Identify the optimisation or code defect; report to the LIS team if it is theirs |
+| 12 | MPI bad blocks at 32+ ranks: -O0 clean; -O2 bad even with NaN init and without vectorisation; not deterministic; varies per forcing read | Assistant | Next probes: -O1, -fno-strict-aliasing, per-read forcing checksums on a bad rank; report to the LIS team if the defect is theirs |
 
 ## 1. MPI baseline
 - Why: the 172x compares one V100 with one serial Fortran core. Real LIS runs on many cores; a fair claim is "N times faster than N cores".

@@ -250,3 +250,9 @@ Same case as above. Wall time **51:32 (3,092 s)**, exit 0, all 240 history files
 - The land mask also differs in the block (2,015 land cells in MPI vs 2,083 in serial: 8 extra, 76 missing), so the block's tile or grid mapping differs, not only the forcing. That points at domain decomposition or the parallel read of the LDT parameter file, rather than the NLDAS-2 file reader alone.
 - Config uses "NLDAS2 netcdf" (plugin `metforcing/nldas-2.0`, `read_nldas20b.F90`), neighbor interpolation. The reader keeps `varfield` and `dummy` (about 400 KB) as automatic stack arrays; stack-size test submitted as `scripts/slurm/gpu_conus_mp5_mpi_stack.sbatch`.
 - Not yet tested: other forcing plugin; non-optimised build (-O0 with NaN-initialised reals); the LDT parameter read on the bad ranks.
+
+### Stack test result and correction (job 37950826, 2026-11-05)
+- The stack limit was already `unlimited` before the script raised it, so this was **not** a test of the stack hypothesis. Hypothesis 1 is still open.
+- The repeat runs give different results for the same layout, so the earlier statement "deterministic per layout" was too strong. Bad blocks at one time step (Tair_f, Feb 3 06Z): 8x5 original (0,2); 8x5 repeat (0,2) and (2,0); 8x4 original (0,1), (2,0), (5,3); 8x4 repeat (0,2). The same two areas recur: columns 0-57 / rows about 90-167 (northern California to Nevada area) and columns 116-173 / rows 0-55 (southern border area).
+- Reading: an initialisation problem that varies between runs (uninitialised memory or a race in start-up arrays such as the neighbor-interpolation index), plus something data-dependent that favours some areas. The error then persists for the whole run.
+- Next, decisive: build the MPI LIS with `-O0 -g -fcheck=all -finit-real=snan -ffpe-trap=invalid` and run 32 ranks for one day; it should stop at the line that uses an uninitialised value. Needs a rebuild of the MPI LIS (`dev/lisf_build_mpi`).

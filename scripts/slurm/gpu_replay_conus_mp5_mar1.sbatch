@@ -9,13 +9,13 @@
 #SBATCH --mem=96G
 #SBATCH --time=03:00:00
 #SBATCH --exclusive
-#SBATCH --output=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/jax-port/gpu_runs/conus_mp5_mar1_replay_%j.out
-JP=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/jax-port
+#SBATCH --output=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lisf-noahmp-jax/gpu_runs/conus_mp5_mar1_replay_%j.out
+JP=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lisf-noahmp-jax
 D=/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run/mp50_rst_mar1
 CONDA=/panfs/ccds02/app/modules/anaconda/platform/x86_64/rhel/8.6/3-2022.05/bin/conda
 unset JAX_COMPILATION_CACHE_DIR XLA_FLAGS
 cd $JP; \rm -rf $D/jx
-$CONDA run --no-capture-output -n graphcast-env python -u -m lisjax.lis -C $D $D/cfg.jx | grep -E "TIMING|rror" | cut -c1-120
+$CONDA run --no-capture-output -n graphcast-env python -u -m lisf_noahmp_jax.driver.lis -C $D $D/cfg.jx | grep -E "TIMING|rror" | cut -c1-120
 RST=$(ls $D/jx/SURFACEMODEL/*/LIS_RST_NoahMP50_201703010000.d01.nc); echo "restart: $RST"
 sed -i "s#RSTFILE#$RST#" $D/lis.config
 source /panfs/ccds02/nobackup/people/gtamkin/dev/lisf_deps/env_lis.sh

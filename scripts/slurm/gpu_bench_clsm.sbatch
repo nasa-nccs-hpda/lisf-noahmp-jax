@@ -9,8 +9,8 @@
 #SBATCH --mem=96G
 #SBATCH --time=03:00:00
 #SBATCH --exclusive
-#SBATCH --output=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/jax-port/gpu_runs/clsm_bench_%j.out
-JP=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/jax-port
+#SBATCH --output=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lisf-noahmp-jax/gpu_runs/clsm_bench_%j.out
+JP=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lisf-noahmp-jax
 RUN=/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run
 CONDA=/panfs/ccds02/app/modules/anaconda/platform/x86_64/rhel/8.6/3-2022.05/bin/conda
 echo "host: $(hostname) gpu: $(nvidia-smi --query-gpu=name,driver_version --format=csv,noheader | head -1) cpu: $(lscpu | grep 'Model name' | sed 's/.*: *//')"
@@ -23,6 +23,6 @@ echo "=== Fortran LIS, 1 day (dump hook disabled with JAXDUMP_CLSM_MAXSTEP=0)"
 echo "=== JAX on V100, 1 day"
 unset JAX_COMPILATION_CACHE_DIR XLA_FLAGS
 cd $JP
-$CONDA run --no-capture-output -n graphcast-env python -u -m lisjax.run_clsm $RUN/conus_clsm1d $RUN/conus_clsm1d/jaxout lis.config 2017020100 2017020200
+$CONDA run --no-capture-output -n graphcast-env python -u -m lisf_noahmp_jax.driver.run_clsm $RUN/conus_clsm1d $RUN/conus_clsm1d/jaxout lis.config 2017020100 2017020200
 echo "=== JAX second run (warm compile cache not shared; timing repeat)"
-$CONDA run --no-capture-output -n graphcast-env python -u -m lisjax.run_clsm $RUN/conus_clsm1d $RUN/conus_clsm1d/jaxout2 lis.config 2017020100 2017020200
+$CONDA run --no-capture-output -n graphcast-env python -u -m lisf_noahmp_jax.driver.run_clsm $RUN/conus_clsm1d $RUN/conus_clsm1d/jaxout2 lis.config 2017020100 2017020200

@@ -9,11 +9,11 @@
 #SBATCH --mem=96G
 #SBATCH --time=03:00:00
 #SBATCH --exclusive
-#SBATCH --output=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/jax-port/gpu_runs/conus_mp7_jax_%j.out
-JP=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/jax-port
+#SBATCH --output=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lisf-noahmp-jax/gpu_runs/conus_mp7_jax_%j.out
+JP=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lisf-noahmp-jax
 RUN=/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run
 CONDA=/panfs/ccds02/app/modules/anaconda/platform/x86_64/rhel/8.6/3-2022.05/bin/conda
 echo "host: $(hostname) gpu: $(nvidia-smi --query-gpu=name,driver_version --format=csv,noheader | head -1)"
 unset JAX_COMPILATION_CACHE_DIR XLA_FLAGS
 cd $JP
-$CONDA run --no-capture-output -n graphcast-env python -u lisjax/bench_conus.py $RUN/conus_mp7 $RUN/conus_mp7/jax7 7
+$CONDA run --no-capture-output -n graphcast-env python -u src/lisf_noahmp_jax/driver/bench_conus.py $RUN/conus_mp7 $RUN/conus_mp7/jax7 7

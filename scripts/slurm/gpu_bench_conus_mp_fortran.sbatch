@@ -9,7 +9,7 @@
 #SBATCH --mem=32G
 #SBATCH --time=03:00:00
 #SBATCH --exclusive
-#SBATCH --output=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/jax-port/gpu_runs/conus_mp_fortran_%j.out
+#SBATCH --output=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lisf-noahmp-jax/gpu_runs/conus_mp_fortran_%j.out
 RUN=/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run
 echo "host: $(hostname) cpu: $(lscpu | grep 'Model name' | sed 's/.*: *//')"
 source /panfs/ccds02/nobackup/people/gtamkin/dev/lisf_deps/env_lis.sh

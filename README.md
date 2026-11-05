@@ -2,7 +2,7 @@
 
 JAX ports of land surface models from NASA's Land Information System Framework (LISF, Fortran), with the Noah-MP family (3.6, 4.0.1, 5.0) first. Each port is checked against the real Fortran LIS (GNU 14, serial) on the same inputs. A research prototype, not a replacement for LIS.
 
-**What it is not:** not all of LIS (no MPI, no LDT/LVT beyond what Noah-MP needs, two forcings, no VIC/CLM2/RUC/JULES). Not independently reproduced or reviewed by the model owners yet (see [docs/PORT_ASSURANCE.md](docs/PORT_ASSURANCE.md)).
+**What it is not:** not all of LIS (single-process JAX, no MPI; no LDT/LVT beyond what Noah-MP needs, two forcings, no VIC/CLM2/RUC/JULES). Not independently reproduced or reviewed by the model owners yet (see [docs/PORT_ASSURANCE.md](docs/PORT_ASSURANCE.md)).
 
 ## Status (2026-11-03)
 - Noah-MP 5.0 (the NCAR snapshot LIS 7.8 uses), 4.0.1, 3.6; Noah 3.x, Mosaic and CLSM F2.5 are ported. Details and open items: [docs/STATUS_20261022.md](docs/STATUS_20261022.md), [docs/ROADMAP.md](docs/ROADMAP.md) (running at-a-glance board).
@@ -15,7 +15,7 @@ The validated environment is Python 3.10 with JAX 0.5.3, numpy and netCDF4 (the 
 ```bash
 PYTHONPATH=src python -m lisf_noahmp_jax.cli -C CASE_DIR CASE_DIR/lis.config.jax     # run from a LIS-style config
 PYTHONPATH=src python -m lisf_noahmp_jax.driver.compare_hist FORTRAN_OUT JAX_OUT      # per-variable p50/p99/max vs the Fortran output
-PYTHONPATH=src python -m pytest tests -q                                              # 48 tests, about an hour on CPU
+PYTHONPATH=src python -m pytest tests -q                                              # 48 tests, about 30 min on one CPU core
 ```
 Run data, forcing and the Fortran build are outside the repository: [docs/DATA_AND_PATHS.md](docs/DATA_AND_PATHS.md), [docs/REPRODUCE_NOAHMP.md](docs/REPRODUCE_NOAHMP.md).
 

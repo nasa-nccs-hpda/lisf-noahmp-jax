@@ -11,9 +11,9 @@ for f in sorted(glob.glob(f"{ref}/SURFACEMODEL/*/LIS_HIST_*.nc")):
     if not os.path.exists(g):
         continue
     a = np.ma.filled(nc.Dataset(f)[var][:].astype(float), np.nan); b = np.ma.filled(nc.Dataset(g)[var][:].astype(float), np.nan)
-    a, b = a.reshape(a.shape[-2:]), b.reshape(b.shape[-2:])
     d = np.abs(a - b)
     bad = (np.isfinite(d) & (d > 0.01)) | (np.isnan(a) != np.isnan(b))
+    bad = bad.reshape((-1,) + bad.shape[-2:]).any(0)   # layers/time folded into one 2-D map of bad cells
     nf += 1; tot += int(bad.sum()); worst = max(worst, int(bad.sum()))
     if np.isfinite(d).any():
         mx = max(mx, float(np.nanmax(d)))

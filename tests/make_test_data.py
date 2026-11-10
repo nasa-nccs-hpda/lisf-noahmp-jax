@@ -78,6 +78,40 @@ def mp_family(case, srcdir, prefix="jaxdump_mp", n=None, ice=False, wet=False, c
     print(case, nrec, "->", len(idx))
 
 
+def snow_family(case, srcdir, prefix="jaxdump_mp", n_each=150, n_rand=100):
+    """Noah-MP 5.0 records on a deep, wet, layered snowpack (CONUS 1 Mar 2017 00-04 UTC, dump of a Fortran run restarted from the 1 Mar state): fixed numbers of records per
+    snow-layer count (ISNOW -1, -2, -3), with liquid water in the pack, with a thick pack, plus snow-free random records. Closes the gap found by the independent review: the 3 h
+    CONUS test set has no layered snow, so snow-hydrology and snow-conductivity edits passed every test."""
+    names, sizes, offs = {}, {}, {}
+    for k in ("pre", "post"):
+        names[k] = [l.split() for l in open(f"{srcdir}/{prefix}_{k}.layout")]
+        sizes[k] = sum(int(b) for _, b in names[k])
+    off = 0
+    for a, b in names["pre"]:
+        offs[a] = (off, int(b)); off += int(b)
+    dt = np.dtype([("w1", ">i4"), ("n1", ">i4"), ("pre", ">f4", (sizes["pre"],)), ("w2", ">i4"), ("n2", ">i4"), ("post", ">f4", (sizes["post"],))])
+    nrec = os.path.getsize(f"{srcdir}/{prefix}.bin") // dt.itemsize
+    mm = np.memmap(f"{srcdir}/{prefix}.bin", dtype=dt, mode="r", shape=(nrec,))
+    col = lambda nme, j=0: np.asarray(mm["pre"][:, offs[nme][0] + j])
+    isn = col("ISNOWXY")
+    liq = sum(col("SNLIQXY", j) for j in range(offs["SNLIQXY"][1]))
+    ice = sum(col("SNICEXY", j) for j in range(offs["SNICEXY"][1]))
+    veg, isice = col("VEGTYP") if "VEGTYP" in offs else col("ivgtyp"), col("p_ISICE")
+    land = veg != isice
+    rng = np.random.default_rng(7)
+    pick = set()
+    for mask, m in (((isn == -1), n_each), ((isn == -2), n_each), ((isn == -3), n_each), ((liq > 1.0), n_each), ((ice > 100.0), n_each), ((isn == 0), n_rand)):
+        idx = np.nonzero(mask & land)[0]
+        pick |= set(rng.choice(idx, min(len(idx), m), replace=False).tolist())
+    idx = np.array(sorted(pick))
+    d = os.path.join(OUT, case); os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, f"{prefix}.bin"), "wb") as f:
+        np.array(mm[idx]).tofile(f)
+    for k in ("pre", "post"):
+        shutil.copy(f"{srcdir}/{prefix}_{k}.layout", os.path.join(d, f"{prefix}_{k}.layout"))
+    print(case, nrec, "->", len(idx))
+
+
 def clsm_family(case, srcdir, steps=(2, 12), ntile=1500):
     sys.path.insert(0, os.path.join(os.path.dirname(OUT), "..", "tools", "replay"))
     import dumpio_clsm as D
@@ -115,6 +149,7 @@ if __name__ == "__main__":
     mp_family("noahmp50", f"{RUN}/mp50_dump_conus", n=600)
     mp_family("noahmp50_sgp", f"{RUN}/mp50_dump_sgp", n=400)
     mp_family("noahmp50_ice", f"{RUN}/mp50_dump_conus", n=300, ice=True)
+    snow_family("noahmp50_snow", f"{RUN}/mp50_rst_mar1")        # deep, wet, layered snowpack (1 Mar 2017 restart)
     # Noah-MP 5.0 surface runoff options 6 (VIC), 7 (Xinanjiang), 8 (dynamic VIC), SGP Feb 14 2017 (10 mm of rain), dumps of lis/variants50.py with VAR_DAY=14
     for r in (6, 7, 8):
         mp_family(f"noahmp50_run{r}", f"{RUN}/mp50v_sgp_runoff{r}w", n=80, wet=True)

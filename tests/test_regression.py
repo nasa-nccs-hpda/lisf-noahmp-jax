@@ -123,6 +123,18 @@ def test_noahmp50_glacier():
     assert n > 100
     check(stats, GLA50)
 
+# Deep, wet, layered snowpack (CONUS 1 Mar 2017, 849 records: 150 each with 1, 2, 3 snow layers, liquid water > 1 mm, snow > 100 mm, plus 100 snow-free; built by
+# make_test_data.snow_family). Limits fixed by rule BEFORE any mutation run: 10 x the p99 measured on 2026-11-10 (float32 noise level), rounded up to one digit.
+# Written to catch the edits that passed every other test: snow-layer liquid retention (SNLIQMAXFRAC), bottom-layer release (SNOW_RET_FAC), ice conductivity (TKICE).
+SNOW50 = dict(TG=7e-4, STC=6e-3, SWE=2e-4, SNICE=5e-6, SNLIQ=3e-6, ZSNSO=3e-6, SNDPTH=1e-6, FSH=2e-1, FIRA=7e-3, SSOIL=7e-3, TV=2e-3, FSA=2e-4, QSNBOT=3e-10)
+
+
+def test_noahmp50_snow():
+    stats, n = R.noahmp50(os.path.join(HERE, "data", "noahmp50_snow"))
+    assert n > 800
+    check(stats, SNOW50)
+
+
 
 # dynamic vegetation 2, 5, 6 (carbon pools, predicted LAI) and 7, 8, 9 (input LAI): SGP Jul 9 2017, 150+ random calls each; measured p99 on 15,000 calls:
 # PLAI 6e-8, FASTCP 6e-5, LFMASS 0, PSN 2e-6 (2-6) and 9e-6 (7-9), TV 6e-5..9e-5, FSH 7e-4..6e-3 (single-tile maxima up to 7 W/m2 in the stability iteration)

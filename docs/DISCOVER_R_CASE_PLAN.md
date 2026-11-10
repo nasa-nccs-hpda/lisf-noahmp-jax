@@ -30,6 +30,9 @@ Directory `/discover/nobackup/projects/eis_freshwater/rabolafi/V5_testing/NLDAS2
 ## 3b. NetCDF NLDAS-2 forcing on Discover? No (checked 2026-11-10)
 `/discover/nobackup/projects/lis/MET_FORCING/` has `NLDAS2.FORCING` (years 1979-2023, hourly `NLDAS_FORA0125_H.A*.002.grb` plus `NLDAS_FORB0125*.grb`, GRIB only, also for 2017), `NLDAS1.FORCING` and `NLDAS_ENS` (`conus_ens_*.nc`, an ensemble product, not NLDAS-2 hourly). No NetCDF copy of the hourly NLDAS-2 forcing found in that collection; other project directories were not searched. Our ADAPT NetCDF files cover Feb-Apr 2017 only, not 2008-2010. So the route is a GRIB reader (`pygrib` is available) or a one-off GRIB-to-NetCDF conversion with it; downloading NetCDF from GES-DISC needs an Earthdata login.
 
+## 3c. Result: GRIB reader vs R's Fortran forcing (2008-10-01 01:00, 2026-11-10, Discover, `tools/forcing/check_grib_vs_hist.py`)
+Venv on Discover: Python 3.12.9 (GEOSpyD module, system site packages for pygrib/netCDF4), jax 0.5.3, pygrib 2.1.6, netCDF4 1.7.2, numpy 2.0.2; repo at 14737c6. The driver's `read_grib` of `NLDAS_FORA0125_H.A20081001.0100.002.grb` against `Tair/Qair/Psurf/LWdown_f_inst` in R's `LIS_HIST_200810010100.d01.nc`: **bitwise identical on all 76,180 cells** for all four; wind speed within 7.7e-7 (float32 rounding of the speed); SWdown 75,592 of 76,180 bitwise (max 4.4 W m-2) and Rainf 64,148 of 76,180 (max 2.8e-3 kg m-2 s-1 differences): these two go through the zenith-angle and bracket time interpolation of the LIS forcing code, which `NLDAS2.at()` implements and which is not part of the reader; not yet separated out. The previous-hour file (00:00) does not match, as expected.
+
 ## 4. Stages
 | # | Stage | Done when | Needs |
 |---|---|---|---|

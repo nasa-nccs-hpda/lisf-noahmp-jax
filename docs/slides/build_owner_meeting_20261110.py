@@ -29,7 +29,7 @@ def slides():
             "Not yet reviewed by a person who knows LIS or Noah-MP. A simulated independent tester rated it acceptable for the named cases, with conditions. Most checks were run by the assistant that wrote the code.",
             "Seasons: Feb-Jul 2017, one SGP year and Oct-Nov 2008 (R's case). Surface fluxes of 5.0 are not yet compared in a free run.",
             "148 CONUS water-soil tiles (soil type 14) go unstable in warm season in BOTH Fortran and JAX: an input-data issue, masked.",
-            "Fair speed claim is 12.1x (vs 20 MPI cores, output verified identical); 172x is vs one core. MPI at 32+ ranks gives wrong output in our GNU build: not the compiler flags, not the file read; the fault is after the interpolation. Unresolved.",
+            "Fair speed claim is 12.1x (vs 20 MPI cores, output verified identical); 172x is vs one core. MPI at 32+ ranks gives wrong output in our GNU build only: R's Intel-built LIS is bitwise identical at 20, 32 and 40 ranks, so the fault is in our build or patches, not LIS. Culprit not yet isolated.",
         ], ORANGE, 10.2, 6)
         banner(p, MARGIN, y + 312, W - 2 * MARGIN, 42, "Message: the hard question (can a JAX Noah-MP reproduce LIS?) now has an answer from two systems and two Fortran builds. The next questions need people who know LIS and Noah-MP.", AMBER, 10.6)
         p.text(MARGIN, 484, W - 2 * MARGIN, "Key: SWE = snow water equivalent (mm). p99 = 99th percentile of the JAX-minus-Fortran difference over all tiles: 99% of values differ by less than this. Tile = one land point of the CONUS grid.", 8.6, MUTED, maxh=24)

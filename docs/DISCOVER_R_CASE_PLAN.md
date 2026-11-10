@@ -40,6 +40,9 @@ Venv on Discover: Python 3.12.9 (GEOSpyD module, system site packages for pygrib
 - First A100 job (59223727) ran 21 s and failed: JAX could not load its CUDA libraries ("Error loading CUDA libraries. GPU will not be used", then "DNN library initialization failed"). Cause: the venv was created with `--system-site-packages`, so pip found the NVIDIA wheels in the GEOSpyD base environment and did not install them into the venv; the JAX CUDA plugin looks for them inside its own site-packages. Fix: a clean `venv2` (no system packages: `pip install 'jax[cuda12]>=0.5,<0.6'` then `pip install -e '.[grib]'`; pygrib 2.1.8 ships a wheel with eccodes). Versions in venv2: jax 0.5.3, numpy 2.5.4, pygrib 2.1.8, netCDF4 1.7.5, cudnn 9.28. The scripts now set `JAX_PLATFORMS=cuda` so a missing GPU fails instead of falling back to CPU. Retry: job 59224273 (pending, priority).
 - Typing into the shared screen session: commands over about 250 characters, `^`, `#`, a trailing `&` before the marker and `\n` in sed all break; scripts go over as base64 lines or via `git pull` (works without a prompt).
 
+## 3e. Result 2026-11-10: 1-day JAX run (CPU) vs R's Fortran
+Forcing bitwise identical (5 fields x 24 h), state p99 at float32 level (SWE 1e-8, SoilTemp 6e-5 K, SoilMoist 3e-7): see `docs/reports/discover_r_case_1d_cpu_20261110.md`. Stages 3-6 for day 1 done; 60-day run and A100 timing next.
+
 ## 4. Stages
 | # | Stage | Done when | Needs |
 |---|---|---|---|

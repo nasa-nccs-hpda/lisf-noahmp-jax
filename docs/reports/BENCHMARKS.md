@@ -282,3 +282,7 @@ Forcing-checksum probe (production -O2 build plus per-rank checksums in `read_nl
 Intel cross-check (2026-11-10, `intel_xcheck_20261110.md`): R's Intel-built LIS is bitwise identical at 20, 32 and 40 ranks (0 differing cells in 120 files each, NetCDF reader path): the fault is specific to our GNU 14.2 / MPICH build or its patches, not to LIS.
 
 Practical consequence: the 20-rank -O2 baseline is clean in all tests (60 days bitwise identical); results at 32 or more ranks with the optimised build must not be used. An -O0 build is clean at 40 ranks but about 1.5x slower (5 days: 4:22 vs 2:57).
+
+## 5.0 closed-loop flux comparison 2026-11-10 (CONUS, 60 d, 6-hourly instantaneous, JAX V100 job 37955747)
+
+All six fluxes pass limits fixed before the run (`tools/compare/flux_compare.py`): p99 |diff| Qle 0.038, Qh 0.49, Qg 0.63, Swnet 0.011, Lwnet 0.12 W/m2, Evap 1.5e-8 kg/m2/s; snow and frozen-soil subsets also pass (frozen Qg 2.6, Qh 2.2). Energy-balance residual agrees with Fortran (p99 0.02 W/m2). Maximum differences are large in a few cells (Qh 425, Qg 432, Swnet 338 W/m2) and were not examined; state drift found earlier (SoilTemp p99 0.56 K) is the likely cause. No noise-floor run. Details: `docs/reports/flux_compare_mp5_60d_20261110.md`.

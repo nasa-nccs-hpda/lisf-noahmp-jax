@@ -30,7 +30,7 @@ Date 2026-11-10. Auditor: Claude (assistant), read-only. Subject: shallow clone 
 
 ## 3. Findings to fix
 1. **Stale paths in `patches/README.md`**: lines 9-10 apply `../patches/bamber19_pass_to_total.patch` and `../patches/deconto21_larmip_pass_to_total.patch`; the files are in `patches/registry/` (the main README has the correct paths). A user following the patches README gets a "file not found".
-2. **Project brief**: client, decision maker, receiving maintainer, support and security contact, delivery date and support period are `Unresolved` (7 entries); handoff form has 3 unresolved rows (monitoring and support contacts, support period, and one more). These need the owner.
+2. **Project brief**: client, decision maker, receiving maintainer, support and security contact, and delivery date and support period are `Unresolved` (5 fields, plus the open question on who maintains it after delivery); the handoff form has 2 unresolved rows (monitoring and support contacts, support period). These need the owner.
 3. **Licences of the patched modules** (section 2) are unconfirmed.
 4. **No end-to-end check that a recipient without the 33 GB data and Apptainer can verify the repo**: only the unit tests (no data needed) and the `--help` smoke tests. Consider a small synthetic fixture and say in the README which checks need what.
 5. Optional: `SECURITY.md` and `CODEOWNERS` once real contacts exist; pin the base image by digest for production, as the template's deployment guide advises.

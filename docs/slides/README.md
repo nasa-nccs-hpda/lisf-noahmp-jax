@@ -19,3 +19,5 @@ python3 make_figures.py images
 python3 build_briefing_decks_20261024.py     # three PDFs here, PNG previews in preview_*/
 ```
 The builder raises if a text block does not fit its box. Only WinAnsi characters are used. `build_briefing_decks_20261022.py` and its PDFs are the previous set (no figures, footer date now shows 2026-10-24 if rebuilt).
+
+- `owner_meeting_20261110.pdf` (builder `build_owner_meeting_20261110.py`): revision of the 2026-11-02 owner-meeting slides with the independent review, the snow test, R's case on Discover (60-day CPU and A100 results) and the narrowed MPI finding. The 2026-11-02 deck stays as presented.

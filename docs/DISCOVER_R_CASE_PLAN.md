@@ -23,9 +23,12 @@ Directory `/discover/nobackup/projects/eis_freshwater/rabolafi/V5_testing/NLDAS2
 
 ## 3. What Discover offers
 - GPU partition `gpu_a100` (10 nodes, 4 x A100, 48 CPUs, 510 GB). First A100 timing for this port (we have V100 only), account `ilab` per the note from the Discover session; groups of gtamkin include s2443, s3278, ilab.
-- Login node can reach PyPI and GitHub (HTTP 200). Python via `module load python/GEOSpyD/24.11.3-0/3.12` (3.12.9; JAX 0.5.x supports 3.10-3.12). Whether eccodes/pygrib/jax/netCDF4 are importable there: not yet checked (a first attempt failed on quoting, not on the modules).
+- Login node can reach PyPI and GitHub (HTTP 200). Python via `module load python/GEOSpyD/24.11.3-0/3.12` (3.12.9; JAX 0.5.x supports 3.10-3.12). Checked 2026-11-10 in that module: `pygrib`, `xarray`, `netCDF4`, `numpy` import; `eccodes`, `cfgrib` and `jax` do not (jax is pip-installable: PyPI is reachable).
 - Compute nodes cannot see /panfs or home: work from `/discover/nobackup/gtamkin`.
 - Access: gateway refuses commands over an SSH master. Commands go through the user's authenticated screen session (`screen -S 3822538.discover -X stuff ...`, log `/home/gtamkin/discover_screen.log`); that session is shared with another Claude session, so keep commands short, use markers, never use `^` or `#` in typed text (screen interprets them), and do not change the shell environment (use subshells).
+
+## 3b. NetCDF NLDAS-2 forcing on Discover? No (checked 2026-11-10)
+`/discover/nobackup/projects/lis/MET_FORCING/` has `NLDAS2.FORCING` (years 1979-2023, hourly `NLDAS_FORA0125_H.A*.002.grb` plus `NLDAS_FORB0125*.grb`, GRIB only, also for 2017), `NLDAS1.FORCING` and `NLDAS_ENS` (`conus_ens_*.nc`, an ensemble product, not NLDAS-2 hourly). No NetCDF copy of the hourly NLDAS-2 forcing found in that collection; other project directories were not searched. Our ADAPT NetCDF files cover Feb-Apr 2017 only, not 2008-2010. So the route is a GRIB reader (`pygrib` is available) or a one-off GRIB-to-NetCDF conversion with it; downloading NetCDF from GES-DISC needs an Earthdata login.
 
 ## 4. Stages
 | # | Stage | Done when | Needs |
@@ -42,7 +45,7 @@ Directory `/discover/nobackup/projects/eis_freshwater/rabolafi/V5_testing/NLDAS2
 
 ## 5. Decisions needed from the user
 1. Clone path for the repo on Discover (user enters a GitHub credential in the screen session, or provides another transfer).
-2. GRIB reader (new code, about a day) or ask R/Discover for the NetCDF NLDAS-2 forcing (check whether `NLDAS2.FORCING` has a NetCDF copy).
+2. GRIB reader with `pygrib` (new code, about a day) or a one-off conversion: no NetCDF copy exists in the Discover collection (3b).
 3. Whether to share the report and results with R, and the repo access that implies.
 4. Slurm account for the A100 job (default `ilab`).
 

@@ -18,6 +18,7 @@ dependencies = [
 gpu = ["jax[cuda12]>=0.5,<0.6"]
 test = ["pytest"]
 slides = ["reportlab", "Pillow", "matplotlib"]
+grib = ["pygrib"]
 
 [project.scripts]
 lisf-noahmp-jax = "lisf_noahmp_jax.cli:main"

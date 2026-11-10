@@ -33,7 +33,8 @@ def main(argv=None):
     model = c.s("Land surface model").strip('"')
     src = c.s("Met forcing sources").strip('"')
     if src.startswith("NLDAS2"):
-        fdir = P(c.s("NLDAS-2.0 FORA forcing directory"))
+        from lisf_noahmp_jax.driver.forcing import forcing_source
+        fdir = P(forcing_source(c.s, src)[1])
     elif src == "MERRA2":
         fdir = P(c.s("MERRA2 forcing directory"))
     else:

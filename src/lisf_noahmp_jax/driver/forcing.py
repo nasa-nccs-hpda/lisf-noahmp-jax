@@ -76,11 +76,59 @@ def zterp1(lat, lon, btime, etime, mbtime, julianb):
 
 
 
+# NLDAS-2 FORA GRIB1 (NLDAS_FORA0125_H.A<date>.<HH>00.002.grb): indicatorOfParameter -> file variable (the names of the netCDF files)
+GRIB_PARAM = {11: "Tair", 51: "Qair", 1: "PSurf", 33: "Wind_E", 34: "Wind_N", 205: "LWdown", 153: "CRainf_frac", 157: "CAPE", 228: "PotEvap", 61: "Rainf",
+              204: "SWdown"}
+
+
+def read_grib(path):
+    """One hourly NLDAS-2 FORA GRIB file -> ({variable: float32 [lat, lon] array, rows south to north, -9999 where undefined}, lat 1-D, lon 1-D)."""
+    import pygrib
+    out = {}
+    la = lo = None
+    g = pygrib.open(path)
+    try:
+        for m in g:
+            name = GRIB_PARAM.get(m.indicatorOfParameter)
+            if name is None:
+                continue
+            lats, lons = m.latlons()
+            v = np.ma.filled(np.ma.masked_values(np.ma.asarray(m.values), 9999.0), 9999.0)
+            v = np.where(v == 9999.0, f32(-9999.0), v).astype(f32)
+            if lats[0, 0] > lats[-1, 0]:
+                v = v[::-1]; lats = lats[::-1]
+            out[name] = v
+            # GRIB1 keeps lat/lon in millidegrees (25.063 for 25.0625): snap to the exact cell centres, which are odd multiples of 1/16 degree on the 1/8 degree NLDAS grid
+            la, lo = (np.round(lats[:, 0] * 16) / 16).astype(f32), (np.round(lons[0] * 16) / 16).astype(f32)
+    finally:
+        g.close()
+    miss = sorted(set(GRIB_PARAM.values()) - set(out))
+    if miss:
+        raise ValueError(f"{path}: GRIB messages for {miss} not found")
+    return out, la, lo
+
+
+def forcing_source(cfg_get, src):
+    """(format, forcing directory) for a LIS 'Met forcing sources' value: "NLDAS2 grib" uses the key `NLDAS2 forcing directory` (metforcing/nldas2),
+    "NLDAS2 netcdf" the key `NLDAS-2.0 FORA forcing directory` (metforcing/nldas-2.0)."""
+    if "grib" in src.lower():
+        return "grib", cfg_get("NLDAS2 forcing directory")
+    return "netcdf", cfg_get("NLDAS-2.0 FORA forcing directory")
+
+
 def _read_hour(job):
     """Worker: one NLDAS-2 hourly file -> per-tile float32 values (None if the file does not exist: look-ahead past the run end)."""
-    path, vars_, j, i, alt = job
+    path, vars_, j, i, alt = job[:5]
+    fmt = job[5] if len(job) > 5 else "netcdf"
     if not os.path.exists(path):
         return None
+    if fmt == "grib":
+        fld = read_grib(path)[0]
+        out = {v: fld[v][j, i].astype(f32) for v in vars_}
+        if alt is not None:
+            for v in ("Wind_E", "Wind_N", "Rainf"):
+                out[v + "_alt"] = fld[v][alt[0], alt[1]].astype(f32)
+        return out
     with nc.Dataset(path) as d:
         out = {v: np.array(d[v][0])[j, i].astype(f32) for v in vars_}
         if alt is not None:
@@ -93,18 +141,22 @@ class NLDAS2:
     LOOKAHEAD = 24
     VARS = ("Tair", "Qair", "PSurf", "Wind_E", "Wind_N", "LWdown", "SWdown", "Rainf")
 
-    def __init__(self, root, lats, lons, extra=(), alt=None):
-        """lats/lons: 1-D arrays (per tile) of domain-cell centers. Uses LIS 'neighbor' rule (half rounds up).
+    def __init__(self, root, lats, lons, extra=(), alt=None, fmt="netcdf", t_ref=None):
+        """lats/lons: 1-D arrays (per tile) of domain-cell centers. fmt: \"netcdf\" (v020 files) or \"grib\" (v002 GRIB, as read by metforcing/nldas2); t_ref: a time whose file exists (grid read from it; default 2017-01-01). Uses LIS 'neighbor' rule (half rounds up).
         extra: additional file variables to read (e.g. 'CRainf_frac').
         alt: optional (lats, lons) of the domain cell whose GRID index equals the TILE index of each tile. Noah 2.7.1's noah271_f2t
         reads Wind_E, Wind_N and the precipitation-validity test at index t instead of tile_id; the values are returned as
         Wind_E_alt / Wind_N_alt (-9999 where undefined) and Rainf_valid_alt."""
         self.root = root
+        self.fmt = fmt
         self.vars = tuple(self.VARS) + tuple(extra)
         self.lats = np.asarray(lats, f32); self.lons = np.asarray(lons, f32)
-        t0 = dt.datetime(2017, 1, 1, 0)
-        with nc.Dataset(self._path(t0)) as d:
-            la = np.array(d["lat"][:]); lo = np.array(d["lon"][:])
+        t0 = t_ref or dt.datetime(2017, 1, 1, 0)
+        if fmt == "grib":
+            _, la, lo = read_grib(self._path(t0))
+        else:
+            with nc.Dataset(self._path(t0)) as d:
+                la = np.array(d["lat"][:]); lo = np.array(d["lon"][:])
         # LIS 'neighbor' interpolation: nearest source cell, nint() (halves round up)
         self.j = np.floor((self.lats.astype(np.float64) - la[0]) / 0.125 + 0.5 + 1e-7).astype(int)
         self.i = np.floor((self.lons.astype(np.float64) - lo[0]) / 0.125 + 0.5 + 1e-7).astype(int)
@@ -118,7 +170,8 @@ class NLDAS2:
         self.nproc = int(os.environ.get("LISJAX_FORCING_PROCS", min(8, len(os.sched_getaffinity(0)))))
 
     def _path(self, t):
-        return (f"{self.root}/{t.year}/{tu.doy(t):03d}/NLDAS_FORA0125_H.A{t:%Y%m%d}.{t:%H}00.020.nc")
+        ext = "002.grb" if self.fmt == "grib" else "020.nc"
+        return f"{self.root}/{t.year}/{tu.doy(t):03d}/NLDAS_FORA0125_H.A{t:%Y%m%d}.{t:%H}00.{ext}"
 
     def hourly(self, t):
         """Hourly file values at the tiles. A cache miss reads the next LOOKAHEAD hours in parallel (worker processes: netCDF-C is
@@ -140,7 +193,7 @@ class NLDAS2:
         return self.cache[t]
 
     def _job(self, t):
-        return (self._path(t), self.vars, self.j, self.i, None if self.alt is None else (self.aj, self.ai))
+        return (self._path(t), self.vars, self.j, self.i, None if self.alt is None else (self.aj, self.ai), self.fmt)
 
     def _pool(self):
         if self.nproc <= 1:

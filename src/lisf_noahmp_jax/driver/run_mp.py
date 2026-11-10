@@ -343,7 +343,9 @@ def run(cfg_path, base_dir, forcing_dir, out_dir, start, end, out_interval_h=6, 
     src = S.cfg.s("Met forcing sources")
     P_ = lambda p: p if p.startswith("/") else f"{base_dir}/{p}"
     if src.startswith("NLDAS2"):
-        F = NLDAS2(P_(S.cfg.s("NLDAS-2.0 FORA forcing directory")), S.lat, S.lon)
+        from lisf_noahmp_jax.driver.forcing import forcing_source
+        ffmt, fd = forcing_source(S.cfg.s, src)
+        F = NLDAS2(P_(fd), S.lat, S.lon, fmt=ffmt, t_ref=start)
     elif src == "MERRA2":
         F = MERRA2(P_(S.cfg.s("MERRA2 forcing directory")), S.lat, S.lon)
     else:

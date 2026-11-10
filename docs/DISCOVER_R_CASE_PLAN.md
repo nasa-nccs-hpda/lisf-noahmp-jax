@@ -37,7 +37,7 @@ Directory `/discover/nobackup/projects/eis_freshwater/rabolafi/V5_testing/NLDAS2
 | 1 | Put the repo on Discover (`git clone` over HTTPS needs a GitHub credential entered by the user; or the user copies a tarball) | `git log` shows the commit; `pip install ".[test]"` into a venv under `/discover/nobackup/gtamkin/venvs` | user credential |
 | 2 | Environment: venv with `jax[cuda12]>=0.5,<0.6`, netCDF4, a GRIB reader; test on a `gpu_a100` allocation (not the login node) | `python -c "import jax; jax.devices()"` shows an A100 | |
 | 3 | Fortran reference check: confirm the existing output is complete for the window we compare (first 1-3 days, then 60 days from 2008-10-01), copy only the needed hourly files (or read in place) | file count and checksums noted; the run's actual stop reason found in `lis.59119005.out` / `noahmp.err` | |
-| 4 | GRIB forcing reader in the JAX driver (or NetCDF conversion) and variable mapping to our 11 forcing fields; verify one hour against the Fortran forcing diagnostics in the history files (`Tair_f_inst` etc.): must match bitwise, as in the NetCDF case | forcing test passes for 24 h | decision: reader vs conversion |
+| 4 | GRIB forcing reader in the JAX driver (done, synthetic-tested) and variable mapping to our 11 forcing fields; verify one hour against the Fortran forcing diagnostics in the history files (`Tair_f_inst` etc.): must match bitwise, as in the NetCDF case | forcing test passes for 24 h | decision: reader vs conversion |
 | 5 | Parameters: build the JAX parameters from `lis_input.nldas2.noahmp401.OL.nc` and the config; list missing 5.0 parameters | 1-step replay or 1-hour run runs without NaN | R's LDT inputs (`LDT/`, `ldt.config.Basic.OL`) |
 | 6 | JAX 1-day run on A100 vs Fortran output; then 60 days (2008-10-01 to 2008-11-30) | compare_hist: p99 per variable, bitwise %, flux variables included (we lack 5.0 fluxes in closed loop so far) | |
 | 7 | Timing: JAX wall time (cold and steady) on A100; Fortran time from R's job log for the same days; report the 60-rank ratio with its caveats (Intel, Milan, 60 ranks, one run, no repeats) | table in `docs/reports/BENCHMARKS.md` | R's job timing |
@@ -45,7 +45,7 @@ Directory `/discover/nobackup/projects/eis_freshwater/rabolafi/V5_testing/NLDAS2
 
 ## 5. Decisions needed from the user
 1. Clone path for the repo on Discover (user enters a GitHub credential in the screen session, or provides another transfer).
-2. GRIB reader with `pygrib` (new code, about a day) or a one-off conversion: no NetCDF copy exists in the Discover collection (3b).
+2. GRIB route: decided, native `pygrib` reader implemented (see 3b); next is checking it on real files.
 3. Whether to share the report and results with R, and the repo access that implies.
 4. Slurm account for the A100 job (default `ilab`).
 

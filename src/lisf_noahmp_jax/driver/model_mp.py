@@ -127,6 +127,7 @@ def make_step(S, jit=True, phys=None, glac=None):
         fveg = out["FVEGMP"]
         stc_soil = new["STC"][:, 3:]
         diag = {
+            "Swnet": out["FSA"], "Lwnet": -out["FIRA"],
             "Qle": lh, "Qh": out["FSH"], "Qg": out["SSOIL"], "Evap": qfx,
             "Qs": out["RUNSF"] * dt, "Qsb": out["RUNSB"] * dt, "RunsfRate": out["RUNSF"], "RunsbRate": out["RUNSB"],
             "AvgSurfT": fveg * out["TV"] + (f32(1.0) - fveg) * out["TGB"],

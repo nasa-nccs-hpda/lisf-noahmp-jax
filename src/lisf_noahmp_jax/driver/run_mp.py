@@ -12,6 +12,8 @@ from lisf_noahmp_jax.driver import model_mp, model_mp36, pert as pertmod
 f32 = np.float32
 # name -> (units, standard_name, long_name)   [as written by LIS for Noah-MP.4.0.1]
 META = {
+    "Swnet": ("W m-2", "surface_net_downward_shortwave_flux", "net downward shortwave radiation"),
+    "Lwnet": ("W m-2", "surface_net_downward_longwave_flux", "net downward longwave radiation"),
     "Qle": ("W m-2", "surface_upward_latent_heat_flux", "latent heat flux"),
     "Qh": ("W m-2", "surface_upward_sensible_heat_flux", "sensible heat flux"),
     "Qg": ("W m-2", "downward_heat_flux_in_soil", "soil heat flux"),
@@ -41,7 +43,7 @@ META = {
     "Greenness": ("-", "green_vegetation_fraction", "green vegetation fraction"),
 }
 TAVG = "Qle Qh Qg Evap AvgSurfT Albedo SoilMoist SoilTemp Wind_f Tair_f Qair_f Psurf_f SWdown_f LWdown_f".split()
-INST = ("AvgSurfT SWE SnowDepth SoilMoist SoilTemp SmLiqFrac CanopInt Snowcover Wind_f Tair_f Qair_f Psurf_f "
+INST = ("Qle Qh Qg Evap Swnet Lwnet AvgSurfT SWE SnowDepth SoilMoist SoilTemp SmLiqFrac CanopInt Snowcover Wind_f Tair_f Qair_f Psurf_f "
         "SWdown_f LWdown_f Landmask Landcover Soiltype Elevation Greenness RelSMC RHMin").split()
 ACC = "Qs Qsb TotalPrecip".split()
 LAYERED = ("SoilMoist", "SoilTemp", "SmLiqFrac", "RelSMC")

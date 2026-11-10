@@ -18,6 +18,8 @@ ln -sfn $R/input input; ln -sfn $R/lis_input.nldas2.noahmp401.OL.nc lis_input.nl
 module load python/GEOSpyD/24.11.3-0/3.12
 if [ ! -d $X/nc/2008/280 ]; then $J/venv2/bin/python $J/lisf-noahmp-jax/tools/forcing/grib_to_nc.py $G $X/nc 20081001 20081006 16; fi
 module purge
+# the module file is the one of the public LISF repo (env/discover/sles15); copy kept here because the module path of R's account is not visible from ours
+module use $J/lisf-noahmp-jax/scripts/discover/intel_xcheck/modulefiles
 module load lisf_7.8_intel_2025.3.2
 ulimit -s unlimited
 for cfg in "20 4 5" "32 8 4" "40 8 5"; do

@@ -33,6 +33,12 @@ Directory `/discover/nobackup/projects/eis_freshwater/rabolafi/V5_testing/NLDAS2
 ## 3c. Result: GRIB reader vs R's Fortran forcing (2008-10-01 01:00, 2026-11-10, Discover, `tools/forcing/check_grib_vs_hist.py`)
 Venv on Discover: Python 3.12.9 (GEOSpyD module, system site packages for pygrib/netCDF4), jax 0.5.3, pygrib 2.1.6, netCDF4 1.7.2, numpy 2.0.2; repo at 14737c6. The driver's `read_grib` of `NLDAS_FORA0125_H.A20081001.0100.002.grb` against `Tair/Qair/Psurf/LWdown_f_inst` in R's `LIS_HIST_200810010100.d01.nc`: **bitwise identical on all 76,180 cells** for all four; wind speed within 7.7e-7 (float32 rounding of the speed); SWdown 75,592 of 76,180 bitwise (max 4.4 W m-2) and Rainf 64,148 of 76,180 (max 2.8e-3 kg m-2 s-1 differences): these two go through the zenith-angle and bracket time interpolation of the LIS forcing code, which `NLDAS2.at()` implements and which is not part of the reader; not yet separated out. The previous-hour file (00:00) does not match, as expected.
 
+## 3d. Status 2026-11-10 (Discover)
+- Parameters: `SetupMP50` builds from R's config and `lis_input.nldas2.noahmp401.OL.nc` (login node, CPU): 76,180 tiles, lat 25.0625-52.9375, lon -124.9375 to -67.0625, same tile count as our CONUS case (`scripts/discover/setup_check.py`).
+- A100 jobs: `gpu_a100` accepts a job only with `-C rome` and a time limit above 1 h (nodes carry features `rome,edr,cssro,notshort`); without them `sbatch` fails with "Requested node configuration is not available" even though `--test-only` passes. Account `ilab`, `--gres=gpu:1 -c 16`. Queue estimate on the day: start about 18:58.
+- 1-day JAX run (2008-10-01 to 10-02, hourly history): job 59223727, `scripts/discover/run1d.sbatch` (`sbatch -C rome`), output `/discover/nobackup/gtamkin/jaxtest/out_1d`, log `r1d_<jobid>.out`. Compare with R's history files using `driver/compare_hist.py`.
+- Typing into the shared screen session: commands over about 250 characters, `^`, `#`, a trailing `&` before the marker and `\n` in sed all break; scripts go over as base64 lines or via `git pull` (works without a prompt).
+
 ## 4. Stages
 | # | Stage | Done when | Needs |
 |---|---|---|---|

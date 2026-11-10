@@ -1,0 +1,20 @@
+#!/bin/bash
+#SBATCH --job-name=jaxr1d
+#SBATCH --partition=gpu_a100
+#SBATCH --account=ilab
+#SBATCH --gres=gpu:1
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=16
+#SBATCH --time=01:00:00
+#SBATCH --output=/discover/nobackup/gtamkin/jaxtest/r1d_%j.out
+module load python/GEOSpyD/24.11.3-0/3.12
+J=/discover/nobackup/gtamkin/jaxtest
+R=/discover/nobackup/projects/eis_freshwater/rabolafi/V5_testing/NLDAS2-v5-testing-OL
+rm -rf $J/out_1d; mkdir -p $J/out_1d
+python3 $J/mkcfg.py $R/lis.config.nldas2.Basic.OL $J/cfg_1d 2008 10 2 $J/out_1d
+nvidia-smi -L
+export LISJAX_FORCING_PROCS=8
+cd $J/lisf-noahmp-jax
+/usr/bin/time -v $J/venv/bin/python -m lisf_noahmp_jax.cli -C $R $J/cfg_1d --hours 1
+ls $J/out_1d/SURFACEMODEL/*/ | head -3

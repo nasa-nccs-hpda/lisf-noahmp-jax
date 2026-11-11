@@ -30,3 +30,19 @@ At the event step (72): Qh 55.0 / 55.0, Qg 92.5 / 92.5, Swnet 170.9 / 170.9 (For
 The Fortran model itself jumps between flux regimes on thin melting snow: steps 62 to 63 Qg 46 to 6, Qh 31 to 78; steps 67 to 68 to 69 Qh 110, 47, 125; step 72 Qh 55 against 127 one step earlier. A free run that sits in the other regime at an output instant differs by 70+ W/m2 with a tiny state difference. Output times are on the hour, and the low-Qh steps 68 and 72 are on the hour, which fits the 57% of outliers at 18Z, but I did not test why.
 
 Limits: one cell, one event; I did not replay other outlier types (Swnet outliers: 26%, cells with SWE differences > 5 mm). The outliers are rare (about 1e-4 of snow-covered cell-times) but not zero, and a user working on thin spring snow would still see them.
+
+## Swnet outliers replayed (2026-11-11)
+
+167 Swnet events > 50 W/m2; in 105 of them the snow cover differs by > 0.3 between the models (one has a thin snowpack the other lacks, so the albedo and Swnet differ). Five cells replayed from the Fortran pre-state over 72 steps (Mar 17 and Mar 24, 18Z; restart of the day 00Z from a continued real-LIS run, jobs 37956110-37956112): (133,428) Mar 17 (Fortran SWE 1.94 mm, JAX 0 in the free run, +337 W/m2) and four Mar 24 cells (JAX 0.5-1.9 mm, Fortran about 0).
+
+| Cell (day) | max abs diff FSH | SSOIL | FSA (Swnet) | SWE |
+|---|---|---|---|---|
+| (133,428) Mar 17 | 9e-5 | 2e-5 | 1.2e-4 | 0 |
+| (218,170) Mar 24 | 1.4e-3 | 8e-4 | 9e-5 | 6e-8 |
+| (197,208) Mar 24 | 2.1e-3 | 1e-3 | 6e-5 | 3e-9 |
+| (201,198) Mar 24 | 2.5e-2 | 2.5e-2 | 6e-5 | 3e-8 |
+| (208,205) Mar 24 | 1.7e-3 | 9e-4 | 6e-5 | 7e-9 |
+
+At the 18Z step (72) all five cells match Fortran (for example Mar 17 Swnet 279.7 / 279.7, Mar 24 (218,170) 535.8 / 535.8 W/m2). From the Fortran state the JAX albedo and snow-cover physics gives the Fortran answer: **not a port error**; the free-run snow-present vs snow-absent flip comes from the state JAX carries in.
+
+Caveat: the restarted Fortran does not reproduce the original 60-day Fortran everywhere. At 18Z on Mar 17 / Mar 24, 9% / 14% of cells differ in SWE (p99 0.12 / 0.73 mm, max 4 / 12 mm) and 10% / 17% in Qh (max 219 / 473 W/m2). The five event cells reproduce exactly (SWE, Qh, Swnet identical), so the replays are valid, but the restart chain is not bitwise (cause not examined: restart contents, or the dump build vs the original binary). Not yet tested: why the free run's snow state first diverges (replay at earlier times).

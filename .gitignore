@@ -140,3 +140,4 @@ dmypy.json
 docs/reports/gpu_runs/
 docs/slides/preview_*/
 .pytest_full.log
+examples/*/out/

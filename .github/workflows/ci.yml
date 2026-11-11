@@ -20,7 +20,7 @@ env:
 
 jobs:
   fast:
-    # CLI smoke plus a replay subset (~2.5 min): LAI tracker, LDT parameter maps, Noah-MP 5.0 deep-snow and land-ice replays against Fortran data in tests/data
+    # CLI smoke plus a replay subset (~4 min): LAI tracker, LDT parameter maps, the shipped 5-day SGP example run against Fortran output (examples/sgp_5d), Noah-MP 5.0 deep-snow and land-ice replays against Fortran data in tests/data
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -38,7 +38,7 @@ jobs:
       - name: Smoke test CLI
         run: uv run --locked lisf-noahmp-jax --help
       - name: Replay subset
-        run: uv run --locked pytest -q tests/test_lai_tracker.py tests/test_ldt.py tests/test_forcing_grib.py tests/test_regression.py -k "lai or ldt or grib or forcing or noahmp50_snow or noahmp50_glacier"
+        run: uv run --locked pytest -q tests/test_lai_tracker.py tests/test_ldt.py tests/test_forcing_grib.py tests/test_example_sgp.py tests/test_regression.py -k "lai or ldt or grib or forcing or example or noahmp50_snow or noahmp50_glacier"
 
   full:
     # all 49 regression tests (~30 min on CPU); weekly and on manual dispatch only

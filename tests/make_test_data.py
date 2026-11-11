@@ -112,6 +112,48 @@ def snow_family(case, srcdir, prefix="jaxdump_mp", n_each=150, n_rand=100):
     print(case, nrec, "->", len(idx))
 
 
+def wet_snow_family(case, srcdirs, prefix="jaxdump_mp", n_each=120):
+    """Noah-MP 5.0 records whose snow layers end the step with a high liquid fraction (CONUS 17 and 24 Mar 2017 dumps of Fortran runs restarted from the real-LIS state of
+    00 UTC): n_each records per band of the largest layer liquid fraction (post state) 0.2-0.3, 0.3-0.39 and > 0.39 (the SNLIQMAXFRAC = 0.4 cap binds), half from each
+    dump, all with snow layers and land (not land ice). Closes the part of the gap that the 1 Mar set left open: a halved cap changed nothing there because no layer
+    was wetter than 0.2 (mutation M8, docs/reports/independent_test_20261105.md)."""
+    rng = np.random.default_rng(11)
+    parts = []
+    for srcdir in srcdirs:
+        names, sizes, offs = {}, {}, {}
+        for k in ("pre", "post"):
+            names[k] = [l.split() for l in open(f"{srcdir}/{prefix}_{k}.layout")]
+            sizes[k] = sum(int(b) for _, b in names[k])
+            o = 0; offs[k] = {}
+            for a, b in names[k]:
+                offs[k][a] = (o, int(b)); o += int(b)
+        dt = np.dtype([("w1", ">i4"), ("n1", ">i4"), ("pre", ">f4", (sizes["pre"],)), ("w2", ">i4"), ("n2", ">i4"), ("post", ">f4", (sizes["post"],))])
+        mm = np.memmap(f"{srcdir}/{prefix}.bin", dtype=dt, mode="r", shape=(os.path.getsize(f"{srcdir}/{prefix}.bin") // dt.itemsize,))
+        fmax = np.zeros(len(mm), np.float32); lay = np.zeros(len(mm), bool)
+        for i in range(0, len(mm), 200000):
+            sl = slice(i, i + 200000)
+            ql = np.stack([np.asarray(mm["post"][sl, offs["post"]["SNLIQXY"][0] + k]) for k in range(3)], 1)
+            qi = np.stack([np.asarray(mm["post"][sl, offs["post"]["SNICEXY"][0] + k]) for k in range(3)], 1)
+            f = ql / np.maximum(ql + qi, 1e-30); f[(ql + qi) < 1e-3] = 0
+            fmax[sl] = f.max(1)
+            lay[sl] = np.asarray(mm["post"][sl, offs["post"]["ISNOWXY"][0]]) < 0
+        veg = np.asarray(mm["pre"][:, offs["pre"]["VEGTYP"][0] if "VEGTYP" in offs["pre"] else offs["pre"]["ivgtyp"][0]])
+        land = veg != np.asarray(mm["pre"][:, offs["pre"]["p_ISICE"][0]])
+        pick = []
+        for lo, hi in ((0.2, 0.3), (0.3, 0.39), (0.39, 1.01)):
+            idx = np.nonzero(lay & land & (fmax > lo) & (fmax <= hi))[0]
+            pick.append(rng.choice(idx, min(len(idx), n_each // len(srcdirs)), replace=False))
+            print(srcdir, lo, hi, len(idx), "->", len(pick[-1]))
+        parts.append(np.array(mm[np.sort(np.concatenate(pick))]))
+    d = os.path.join(OUT, case); os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, f"{prefix}.bin"), "wb") as f:
+        for a in parts:
+            a.tofile(f)
+    for k in ("pre", "post"):
+        shutil.copy(f"{srcdirs[0]}/{prefix}_{k}.layout", os.path.join(d, f"{prefix}_{k}.layout"))
+    print(case, "->", sum(len(a) for a in parts))
+
+
 def clsm_family(case, srcdir, steps=(2, 12), ntile=1500):
     sys.path.insert(0, os.path.join(os.path.dirname(OUT), "..", "tools", "replay"))
     import dumpio_clsm as D
@@ -150,6 +192,7 @@ if __name__ == "__main__":
     mp_family("noahmp50_sgp", f"{RUN}/mp50_dump_sgp", n=400)
     mp_family("noahmp50_ice", f"{RUN}/mp50_dump_conus", n=300, ice=True)
     snow_family("noahmp50_snow", f"{RUN}/mp50_rst_mar1")        # deep, wet, layered snowpack (1 Mar 2017 restart)
+    wet_snow_family("noahmp50_wetsnow", [f"{RUN}/mp50_evt0317", f"{RUN}/mp50_evt0324"])   # layers with liquid fraction 0.2-0.4 and at the 0.4 cap
     # Noah-MP 5.0 surface runoff options 6 (VIC), 7 (Xinanjiang), 8 (dynamic VIC), SGP Feb 14 2017 (10 mm of rain), dumps of lis/variants50.py with VAR_DAY=14
     for r in (6, 7, 8):
         mp_family(f"noahmp50_run{r}", f"{RUN}/mp50v_sgp_runoff{r}w", n=80, wet=True)

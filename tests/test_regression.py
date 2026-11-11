@@ -135,6 +135,19 @@ def test_noahmp50_snow():
     check(stats, SNOW50)
 
 
+# Snow layers that end the step wet (360 records, 2026-11-11: 60 each from the 17 and 24 Mar 2017 Fortran dumps in the bands of largest layer liquid fraction 0.2-0.3,
+# 0.3-0.39 and > 0.39 = the SNLIQMAXFRAC cap binds; built by make_test_data.wet_snow_family). Limits fixed by the same rule as SNOW50, BEFORE any mutation run:
+# 10 x the p99 measured on the unmutated port (10 x the max where the p99 is 0), rounded up to one digit. Written to catch mutation M8 (cap halved), which the
+# 1 Mar set missed because no layer there was wetter than 0.2.
+WETSNOW50 = dict(TG=7e-4, STC=3e-4, SWE=4e-5, SNICE=3e-5, SNLIQ=3e-5, ZSNSO=3e-7, SNDPTH=4e-7, FSH=2e-1, FIRA=4e-3, SSOIL=2e-2, TV=7e-4, FSA=4e-3, QSNBOT=5e-8)
+
+
+def test_noahmp50_wetsnow():
+    stats, n = R.noahmp50(os.path.join(HERE, "data", "noahmp50_wetsnow"))
+    assert n > 300
+    check(stats, WETSNOW50)
+
+
 
 # dynamic vegetation 2, 5, 6 (carbon pools, predicted LAI) and 7, 8, 9 (input LAI): SGP Jul 9 2017, 150+ random calls each; measured p99 on 15,000 calls:
 # PLAI 6e-8, FASTCP 6e-5, LFMASS 0, PSN 2e-6 (2-6) and 9e-6 (7-9), TV 6e-5..9e-5, FSH 7e-4..6e-3 (single-tile maxima up to 7 W/m2 in the stability iteration)

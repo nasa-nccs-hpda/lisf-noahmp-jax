@@ -36,7 +36,7 @@ def run(mid, sel, py):
 
 
 if __name__ == "__main__":
-    a = sys.argv[1:]; sel = "test_noahmp50_snow"
+    a = sys.argv[1:]; sel = "test_noahmp50_snow or test_noahmp50_wetsnow"
     if "-k" in a:
         i = a.index("-k"); sel = a[i + 1]; del a[i:i + 2]
     ids = a or ["M1", "M3", "M6", "M8"]

@@ -13,4 +13,20 @@ Follows `flux_compare_mp5_60d_20261110.md`. Outlier = |JAX - Fortran| > 50 W/m2 
 
 Reading: these are thin, near-freezing snow cells at the melt/no-melt edge, where the surface temperature and snow-cover fraction solution is sensitive, so a small state difference gives a large instantaneous flux difference that relaxes by the next output. Same cells fit the earlier SWE/SoilTemp drift. This is consistent with the data but not proven: I did not step the Fortran and JAX columns from identical state for these cells, and 86 of 650 events have a SWE difference > 5 mm or snow-cover difference > 0.5, the rest have similar snow state.
 
-Limit: the outliers are rare (about 1e-4 of snow-covered cell-times) but not zero, and a user working on thin spring snow would see them. A replay of one event from the Fortran pre-state (dump hook, `replay_mp50.py`) would say whether it is a port error or sensitivity. Not done.
+## Replay from the Fortran pre-state (2026-11-11)
+
+Cell (192,215), 2017-03-06 18Z (Fortran Qh 55, JAX closed loop 128). Stage 1: real LIS, MPI 20 ranks, Feb 1 to Mar 6 with daily restarts (28.6 min, job 37956056). Stage 2: Fortran dump LIS from the Mar 6 00Z restart, 72 steps of 15 min, snow tiles (job 37956073; it reproduces the original 60-day Fortran exactly at this cell: SWE 2.68 mm, Qh 55.0, Swnet 170.9 at 18Z). Replay: `tools/replay/replay_event.py`, JAX `noahmp50_jax` stepped from the Fortran pre-state at every step.
+
+| Result (all 72 steps, same cell) | max abs difference |
+|---|---|
+| FSH (Qh) | 0.002 W/m2 |
+| SSOIL (Qg) | 0.0008 W/m2 |
+| FSA, FIRA | 5e-5, 2e-4 W/m2 |
+| TG, TV | 3e-5 K |
+| SWE | 7e-9 mm |
+
+At the event step (72): Qh 55.0 / 55.0, Qg 92.5 / 92.5, Swnet 170.9 / 170.9 (Fortran / JAX). So from identical state the JAX physics gives the Fortran answer, including at the outlier step: **not a port error in the physics for this event**. The 128 vs 55 in the free run comes from the state JAX carries into that step (SWE 3.2 vs 2.7 mm).
+
+The Fortran model itself jumps between flux regimes on thin melting snow: steps 62 to 63 Qg 46 to 6, Qh 31 to 78; steps 67 to 68 to 69 Qh 110, 47, 125; step 72 Qh 55 against 127 one step earlier. A free run that sits in the other regime at an output instant differs by 70+ W/m2 with a tiny state difference. Output times are on the hour, and the low-Qh steps 68 and 72 are on the hour, which fits the 57% of outliers at 18Z, but I did not test why.
+
+Limits: one cell, one event; I did not replay other outlier types (Swnet outliers: 26%, cells with SWE differences > 5 mm). The outliers are rare (about 1e-4 of snow-covered cell-times) but not zero, and a user working on thin spring snow would still see them.

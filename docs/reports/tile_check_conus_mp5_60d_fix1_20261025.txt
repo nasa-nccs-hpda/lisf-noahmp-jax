@@ -1,5 +1,0 @@
-240 history files; N = 200 worst tiles per variable
-variable     tiles  overlap  random spearman  A@Aworst  B@Aworst  B@Bworst  A@Bworst  (A=|Fortran-JAX|, B=|JAX-JAX+1ulp|, max over time)
-SWE_inst     58014       46     0.7    0.807      3.88      1.25      5.01    0.0503
-SoilMoist_inst   76149       50     0.5    0.268    0.0245   0.00427     0.028  0.000445
-SoilTemp_inst   76180       48     0.5    0.844      2.79      1.19      3.88     0.257

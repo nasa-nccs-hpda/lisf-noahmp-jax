@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=32G
 #SBATCH --time=12:00:00
-#SBATCH --output=$LISFJAX_REPO/gpu_runs/conus_mp5_long_f3_%j.out
+#SBATCH --output=gpu_runs/conus_mp5_long_f3_%j.out
 D=$LISF_RUN/conus_mp5_long
 echo "host: $(hostname) cpu: $(lscpu | grep 'Model name' | sed 's/.*: *//')"
 source $LISF_DEPS/env_lis.sh

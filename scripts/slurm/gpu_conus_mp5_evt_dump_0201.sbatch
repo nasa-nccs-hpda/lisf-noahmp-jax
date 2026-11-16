@@ -7,7 +7,7 @@
 #SBATCH --exclusive
 #SBATCH --mem=0
 #SBATCH --time=03:00:00
-#SBATCH --output=$LISF_RUN/mp50_evt0201/dump_%j.out
+#SBATCH --output=%x_%j.out
 D=$LISF_RUN/mp50_evt0201
 cd $D
 source $LISF_DEPS/env_lis.sh

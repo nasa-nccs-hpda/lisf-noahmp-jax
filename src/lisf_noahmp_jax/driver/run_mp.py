@@ -7,7 +7,7 @@ import jax.experimental
 import netCDF4 as nc
 from lisf_noahmp_jax.driver.params_mp import SetupMP
 from lisf_noahmp_jax.driver.forcing import NLDAS2, MERRA2
-from lisf_noahmp_jax.driver import model_mp, model_mp36, pert as pertmod
+from lisf_noahmp_jax.driver import model_mp, pert as pertmod
 
 f32 = np.float32
 # name -> (units, standard_name, long_name)   [as written by LIS for Noah-MP.4.0.1]
@@ -332,12 +332,8 @@ def run(cfg_path, base_dir, forcing_dir, out_dir, start, end, out_interval_h=6, 
     t_all = time.time(); t = time.time()
     from lisf_noahmp_jax.driver.config import Config as _Cfg
     lsm = _Cfg(cfg_path).s("Land surface model")
-    v36 = lsm == "NoahMP.3.6"
     v50 = lsm == "Noah-MP.5.0"
-    if v36:
-        from lisf_noahmp_jax.driver.params_mp36 import SetupMP36
-        S = SetupMP36(cfg_path, base_dir)
-    elif v50:
+    if v50:
         from lisf_noahmp_jax.driver.params_mp50 import SetupMP50
         S = SetupMP50(cfg_path, base_dir)
     else:
@@ -361,7 +357,7 @@ def run(cfg_path, base_dir, forcing_dir, out_dir, start, end, out_interval_h=6, 
         from ..physics import noahmp50_jax, noahmp50_glacier_jax
         step = model_mp.make_step(S, jit=False, phys=noahmp50_jax, glac=noahmp50_glacier_jax)
     else:
-        step = (model_mp36 if v36 else model_mp).make_step(S, jit=False)
+        step = model_mp.make_step(S, jit=False)
     chunk = make_chunk(S, step)
     FP = None
     if S.cfg.s("Forcing perturbation algorithm").lower() != "none":
@@ -394,7 +390,7 @@ def run(cfg_path, base_dir, forcing_dir, out_dir, start, end, out_interval_h=6, 
     st0["RHMIN"] = np.full(ncell, 999.0, f32)
     if restart_in:
         st0 = read_restart(restart_in, S, st0)
-    elif not v36:
+    else:
         # coldstart first-step fix-ups (noahmp_driver_401: itimestep == 1)
         first = F.at(start + dt.timedelta(seconds=S.dt))
         q2 = first["Qair"] / (f32(1) - first["Qair"])

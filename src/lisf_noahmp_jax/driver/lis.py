@@ -1,14 +1,14 @@
 """LIS-style front end of the Python/JAX port: reads a LIS configuration file (lis.config), picks the land surface model, and runs the
 period given by the 'Starting ...' / 'Ending ...' keys, writing LIS-style history files under 'Output directory'.
 usage: python -m lisf_noahmp_jax.driver.lis [-C CASE_DIR] lis.config
-Supported 'Land surface model' values: Noah.3.9, Noah.3.6, Noah.3.3, Noah.3.2, Noah.2.7.1, Noah-MP.4.0.1, NoahMP.3.6, CLSM F2.5, Mosaic (see STATUS_20261022.md for the
-validated configurations; other keys of the configuration are read only by the model that needs them). Forcing: NLDAS2 netcdf, MERRA2."""
+Supported 'Land surface model' values: Noah-MP.5.0 (validated) and Noah-MP.4.0.1 (shares the code path). Other models of the earlier port are in the git tag
+archive-2026-11-16. Other keys of the configuration are read only by the model that needs them). Forcing: NLDAS2 netcdf, MERRA2."""
 import sys, os, datetime as dt, argparse
 from lisf_noahmp_jax.driver.config import Config
 
 
 # LIS restart-file names (LIS_RST_<tag>_YYYYMMDDHHMM.d01.nc) of the models whose runner can read and write restarts
-RST_TAG = {"Noah-MP.4.0.1": "NOAHMP401", "Noah-MP.5.0": "NoahMP50", "NoahMP.3.6": "NOAHMP36", "Noah.3.9": "NOAH39", "Noah.3.6": "NOAH36"}
+RST_TAG = {"Noah-MP.4.0.1": "NOAHMP401", "Noah-MP.5.0": "NoahMP50"}
 
 
 def period(c):
@@ -40,14 +40,8 @@ def main(argv=None):
     else:
         raise SystemExit(f"forcing source {src!r} is not ported")
     tm = {}
-    if model.startswith("Noah-MP") or model == "NoahMP.3.6":
+    if model in ("Noah-MP.5.0", "Noah-MP.4.0.1"):
         from lisf_noahmp_jax.driver import run_mp as R
-    elif model in ("Noah.3.9", "Noah.3.6", "Noah.3.3", "Noah.3.2", "Noah.2.7.1"):
-        from lisf_noahmp_jax.driver import run as R
-    elif model.startswith("CLSM"):
-        from lisf_noahmp_jax.driver import run_clsm as R
-    elif model == "Mosaic":
-        from lisf_noahmp_jax.driver import run_mos as R
     else:
         raise SystemExit(f"land surface model {model!r} is not ported")
     kw = {}

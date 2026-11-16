@@ -141,3 +141,6 @@ docs/reports/gpu_runs/
 docs/slides/preview_*/
 .pytest_full.log
 examples/*/out/
+docs/slides/preview/
+gpu_runs/
+*_[0-9]*.out

@@ -2,7 +2,7 @@
 sample of 500-700 SFLX calls per model (data/ built by make_test_data.py). Thresholds are on the 99th percentile of the absolute error
 (maxima are not meaningful for float32 freeze/thaw tiles, see STATUS_20261022.md section 3) and are about 5-10 times the values measured on
 2026-10-22, so a real change of the physics fails and rounding-level noise does not.
-run:  JAX_PLATFORMS=cpu python3 -m pytest -q tests          (about 31 min on one CPU core: 5 default cases + 22 Noah-MP option variants + 3 Noah-MP 5.0 cases)"""
+run:  JAX_PLATFORMS=cpu python3 -m pytest -q tests          (about 31 min on one CPU core: Noah-MP 4.0.1 option variants + Noah-MP 5.0 cases)"""
 import os
 import pytest
 import replay_cases as R
@@ -10,9 +10,6 @@ import replay_cases as R
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 # p99 absolute error limits per field
-NOAH33 = dict(t1=1e-3, stc1=5e-3, smc1=1e-6, sh2o1=1e-4, eta=5e-2, sheat=0.2, ssoil=0.2, snowh=1e-6, sneqv=1e-7, cmc=1e-8, runoff1=1e-12,
-              runoff2=1e-11, evp=1e-8)
-NOAH271 = dict(t1=1e-3, stc1=1e-2, smc1=1e-6, sh2o1=1e-4, eta=5e-3, snowh=1e-6, sneqv=1e-7, cmc=1e-8, evp=1e-8)
 MP = dict(TV=1e-2, TG=2e-3, FSH=5e-2, FCTR=1e-3, FGEV=2e-3, SSOIL=5e-2, FIRA=2e-2, FSA=1e-3, STC=1e-3, SMC=1e-6, SWE=1e-5, SNDPTH=1e-7,
           CANLIQ=1e-5, CANICE=1e-5, ECAN=1e-8, ETRAN=1e-8, ESOIL=1e-8, ZWT=1e-4, RUNSF=1e-9, RUNSB=1e-9, FSNO=1e-5)
 
@@ -26,33 +23,8 @@ def check(stats, limits):
 
 
 @pytest.fixture(scope="module")
-def noah33():
-    return R.noah33()
-
-
-@pytest.fixture(scope="module")
-def noah271():
-    return R.noah271()
-
-
-@pytest.fixture(scope="module")
 def mp401():
     return R.noahmp("401", os.path.join(HERE, "data", "noahmp401"))[0]
-
-
-@pytest.fixture(scope="module")
-def mp36():
-    return R.noahmp("36", os.path.join(HERE, "data", "noahmp36"))[0]
-
-
-def test_noah33(noah33):
-    check(noah33, NOAH33)
-
-
-def test_noah271(noah271):
-    check(noah271, NOAH271)
-    # SH2O(1) based direct evaporation (3.x uses SMC(1)): the layer-1 moisture of tiles with soil ice would be off by 1e-4 otherwise
-    assert noah271["smc1"]["p99"] < 1e-6
 
 
 def test_noahmp401(mp401):
@@ -60,36 +32,12 @@ def test_noahmp401(mp401):
     assert mp401["ISNOW"]["max"] == 0.0
 
 
-def test_noahmp36(mp36):
-    check(mp36, MP)
-    assert mp36["ISNOW"]["max"] == 0.0
-
-
-# CLSM F2.5 core (clsmf25) on the July 1 2017 coldstart call dump, steps 2 and 12, 1500 tiles. July wet-canopy and freezing tiles are
-# ill-conditioned (see LOG.md 2026-10-22 ~21:30), so the limits are looser than for the other models and on p99 only.
-CLSM = dict(tc1=0.05, tc2=0.05, tc4=0.05, qa1=1e-5, capac=1e-3, catdef=1e-2, rzexc=1e-2, srfexc=1e-2, evap=1e-4, shflux=20.0, hlatn=20.0,
-            tsurf=0.5, ar1=1e-4, ghflux=5.0, tp1=0.1, runoff=1e-5)
-
-
-@pytest.fixture(scope="module")
-def clsm():
-    return R.clsm()
-
-
-def test_clsm(clsm):
-    check(clsm, CLSM)
-
-
-# Noah-MP option variants (data/noahmp401_<tag>, data/noahmp36_<tag>: 266 recorded calls each, recorded with the option changed in lis.config).
+# Noah-MP option variants (data/noahmp401_<tag>: 266 recorded calls each, recorded with the option changed in lis.config).
 # Same p99 limits as the default case; the loosened ones are measured differences of the Fortran/JAX pair, not tuned to pass:
-#  - 3.6 sfc=2 (Chen 1997 without the 4.0.1 stability limits) is ill-conditioned for about 1% of the tiles (LOG.md 2026-10-23 ~00:30)
 #  - 401 sfc=2 and stc 2/3 move the surface fluxes of the snow tiles a little more than the default case
-MP_LOOSE_36_SFC2 = dict(MP, TV=0.2, TG=0.05, FSH=1.0, FCTR=5e-3, FGEV=0.05, SSOIL=1.0, FIRA=0.5, FSA=1e-3)
 MP_LOOSE_401 = dict(MP, TV=5e-2, TG=1e-2, FSH=0.2, SSOIL=0.2, FIRA=0.1)
-MP_LOOSE_36_STC2 = MP_LOOSE_401       # 266 calls, a third of them on snow: p99 is the third-largest error, noisy; the replay of all snow tiles gave FSH p99 2.3e-3, TG 6e-5 K (limits raised after seeing 0.064 W/m2 and 2.2e-3 K)
 VARIANTS = [("401", t, MP) for t in ("run2", "run3", "run4", "frz2", "inf2", "crs2", "dveg3", "dveg1")] + \
-           [("401", "sfc2", MP_LOOSE_401), ("401", "stc2", MP_LOOSE_401), ("401", "stc3", MP_LOOSE_401)] + \
-           [("36", t, MP) for t in ("run2", "run4", "frz2", "inf2", "crs2", "dveg3", "dveg1")] + [("36", "stc2", MP_LOOSE_36_STC2), ("36", "sfc2", MP_LOOSE_36_SFC2)]
+           [("401", "sfc2", MP_LOOSE_401), ("401", "stc2", MP_LOOSE_401), ("401", "stc3", MP_LOOSE_401)]
 
 
 @pytest.mark.parametrize("ver,tag,limits", VARIANTS, ids=[f"mp{v}-{t}" for v, t, _ in VARIANTS])

@@ -7,7 +7,7 @@
 #SBATCH --exclusive
 #SBATCH --mem=0
 #SBATCH --time=03:00:00
-#SBATCH --output=$LISF_RUN/mp50_evt0306b/dump_%j.out
+#SBATCH --output=%x_%j.out
 D=$LISF_RUN/mp50_evt0306b
 RST=$(ls $LISF_RUN/conus_mp5_mpi/lisout_evt/SURFACEMODEL/*/LIS_RST_NoahMP50_201703060000.d01.nc); echo "restart: $RST"
 cd $D; sed -i "s#^Noah-MP.5.0 restart file:.*#Noah-MP.5.0 restart file: $RST#" lis.config

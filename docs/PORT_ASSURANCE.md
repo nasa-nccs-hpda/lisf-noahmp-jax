@@ -2,7 +2,7 @@
 
 Purpose: one repeatable way to say how far a JAX port of a Fortran model can be trusted, and what is still missing. Draft v0.1, 2026-11-03, written by the port author; it has not been reviewed by the model owners. Their review of the gates and thresholds is part of adopting it.
 
-## Principles (learned on Noah-MP, CLSM, Mosaic)
+## Principles (learned on Noah-MP and other models in the earlier port)
 1. **Fix the reference before testing**: model version/commit, compiler, options, inputs. Record them.
 2. **Set pass/fail thresholds before looking at results**, per variable, written in the report.
 3. **Judge float32 by p99, report max with an explanation.** Single tiles at snow/freeze-thaw thresholds amplify rounding; a max is not a verdict by itself.
@@ -37,8 +37,6 @@ Purpose: one repeatable way to say how far a JAX port of a Fortran model can be 
 |---|---|---|---|---|---|---|---|---|---|---|
 | Noah-MP 5.0 (LIS 7.8 pin) | yes | yes | most options; gaps listed | 60 d independent, 150 d partly from JAX restarts | partial (one-ulp, 46-50/200 overlap) | yes (2026-11-17): NaN/range/energy on the SGP example, water balance on replay, both no worse than Fortran | no | serial and 20/40-core MPI (one run each) | partial: configs in `configs/`, example and replay tables reproduce from a clean checkout; CONUS tables need external data and our Fortran build | 1 (cases listed; G8 partial) |
 | Noah-MP 4.0.1 | yes | yes | yes | CONUS 89 d | one-ulp done | not systematic | no | serial only | partial | 1 |
-| CLSM F2.5 | yes | yes (76,088 tiles) | partial | 1 day | chaos shown | not systematic | no | serial only | partial | 0-1 |
-| Noah-MP 5.2.1 deltas | pin chosen | no | no | no | no | no | no | no | no | not started |
 
 ## Per-port report template (copy into Reports/)
 1. Reference pin and build; 2. options in/out of scope; 3. thresholds (fixed before runs); 4. G1 table; 5. G3 table with max and p99; 6. noise-floor result; 7. balance/sanity result; 8. who reproduced it; 9. speed claim with baseline; 10. NOT VALIDATED list.

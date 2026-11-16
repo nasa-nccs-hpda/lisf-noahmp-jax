@@ -1,5 +1,5 @@
 """Open-loop replay helpers used by the regression tests: run the JAX column physics on recorded inputs of the real LIS (GNU 14 serial) and
-return the error statistics against the recorded Fortran outputs. Mirrors tools/replay/replay33.py, replay271.py and replay_mp.py."""
+return the error statistics against the recorded Fortran outputs. Mirrors tools/replay/replay_mp.py."""
 import os, sys
 import numpy as np
 import jax, jax.numpy as jnp
@@ -21,38 +21,6 @@ def stats(d, post, names):
         out[n] = dict(p50=float(np.percentile(e, 50)), p99=float(np.percentile(e, 99)), max=float(e.max()), nonfinite=int((np.isfinite(a) & ~np.isfinite(b)).sum()),
                       rng=float(np.ptp(a[ok])))
     return out
-
-
-def noah33(path=os.path.join(HERE, "data", "noah33", "jaxdump_noah39.bin")):
-    import dumpio, replay
-    from lisf_noahmp_jax.physics import noah39_jax as nj
-    hdr, pre, post = dumpio.load(path)
-    par, st, forc = replay.build(pre)
-    sld = [jnp.float32(x) for x in (0.1, 0.3, 0.6, 1.0)]
-    isurban = int(pre["isurban"][0])
-    one = lambda p, s, f: nj.sflx(f, p, s, jnp.float32(pre["dt"][0]), jnp.float32(2.0), sld, opt_thcnd=0, isurban=isurban,
-                                  aoasis=jnp.float32(1.0), ua=False, v36=True, v33=True)
-    ax = {k: (1 if k in ("stc", "smc", "sh2o") else 0) for k in "cmc t1 snowh sneqv albedo z0 snotime1 xlai emissi stc smc sh2o".split()}
-    fn = jax.jit(jax.vmap(one, in_axes=({k: 0 for k in replay.PAR_KEYS}, ax, {k: 0 for k in replay.FORC_KEYS}),
-                          out_axes=({k: (1 if k in ('stc', 'smc', 'sh2o') else 0) for k in
-                                     'cmc t1 snowh sneqv albedo sncovr z0 snotime1 q1 emissi xlai stc smc sh2o'.split()}, 0)))
-    d = replay.flatten(*fn({k: jnp.asarray(v) for k, v in par.items()}, {k: jnp.asarray(v) for k, v in st.items()},
-                           {k: jnp.asarray(v) for k, v in forc.items()}))
-    return stats(d, post, [n for n in dumpio.POST_NAMES if n in d])
-
-
-def noah271(path=os.path.join(HERE, "data", "noah271", "jaxdump_noah39.bin")):
-    import replay271 as R
-    from lisf_noahmp_jax.physics import noah271_jax as n2
-    hdr, pre, post = R.load(path)
-    par, st, forc = R.build(pre, post)
-    sld = [jnp.float32(x) for x in (0.1, 0.3, 0.6, 1.0)]
-    dt = jnp.float32(pre["dt"][0])
-    st_ax = {k: (1 if k in ("stc", "smc", "sh2o") else 0) for k in "cmc t1 snowh sneqv stc smc sh2o".split()}
-    fn = jax.jit(jax.vmap(lambda p, s, f: n2.sflx(f, p, s, dt, sld), in_axes=({k: 0 for k in par}, st_ax, {k: 0 for k in forc}), out_axes=(st_ax, 0)))
-    d = R.flatten(*fn({k: jnp.asarray(v) for k, v in par.items()}, {k: jnp.asarray(v) for k, v in st.items()},
-                      {k: jnp.asarray(v) for k, v in forc.items()}))
-    return stats(d, post, [n for n in R.POST if n in d and n != "etanrg"])
 
 
 def noahmp(version, ddir):
@@ -106,23 +74,3 @@ def noahmp50(ddir, ice=False):
     r = fn({k: jnp.asarray(v) for k, v in P.items()}, {k: jnp.asarray(v) for k, v in x.items()})
     d = {k: np.stack([np.asarray(e) for e in v], -1) if isinstance(v, list) else np.asarray(v) for k, v in r.items()}
     return stats(d, post, [n for n in d if n in post]), len(x["SWE"])
-
-
-def clsm(path=os.path.join(HERE, "data", "clsm", "clsm_calls.npz")):
-    from lisf_noahmp_jax.physics import clsm_jax as C
-    import replay_clsm as RC
-    z = np.load(path)
-    acc = {}
-    for s in [int(v) for v in z["steps"]]:
-        def grab(tag):
-            pre = f"{tag}{s}_"
-            return {k[len(pre):]: (float(z[k]) if z[k].ndim == 0 else z[k]) for k in z.files if k.startswith(pre)}
-        inp, outp = grab("in"), grab("out")
-        fn = jax.jit(lambda x: C.clsmf25(jnp.float32(inp["dtstep"]), jnp.float32(inp["sfrac"]), x))
-        out = fn(RC.build_x(inp))
-        for k, (a, b) in RC.compare(out, outp).items():
-            acc.setdefault(k, ([], []))
-            acc[k][0].append(np.asarray(a, np.float64)); acc[k][1].append(np.asarray(b, np.float64))
-    d = {k: np.concatenate(v[0]) for k, v in acc.items()}
-    post = {k: np.concatenate(v[1]) for k, v in acc.items()}
-    return stats(d, post, list(d))

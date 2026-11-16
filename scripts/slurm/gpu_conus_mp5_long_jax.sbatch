@@ -9,7 +9,7 @@
 #SBATCH --mem=96G
 #SBATCH --time=03:00:00
 #SBATCH --exclusive
-#SBATCH --output=$LISFJAX_REPO/gpu_runs/conus_mp5_long_jax_%j.out
+#SBATCH --output=gpu_runs/conus_mp5_long_jax_%j.out
 JP=$LISFJAX_REPO
 D=$LISF_RUN/conus_mp5_long
 CONDA=$CONDA_BIN

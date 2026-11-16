@@ -8,7 +8,7 @@
 #SBATCH --exclusive
 #SBATCH --mem=0
 #SBATCH --time=03:00:00
-#SBATCH --output=$LISF_RUN/mp50_evt_dd_%j.out
+#SBATCH --output=%x_%j.out
 R=$LISF_RUN
 D=$R/mp50_evt03$DAY
 RST=$(ls $R/conus_mp5_mpi/lisout_evt2/SURFACEMODEL/201703/LIS_RST_NoahMP50_201703${DAY}0000.d01.nc); echo "restart: $RST"

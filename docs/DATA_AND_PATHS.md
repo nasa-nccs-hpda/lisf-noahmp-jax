@@ -6,19 +6,17 @@ Owner: G. Tamkin. Written by a Claude Code session from the paths used in the ru
 
 | Variable (export before use) | What it is | Value |
 |---|---|---|
-| `LISF_RUN` | case directories (`conus_clsm1d`, `conus_hy`, `conus_mp7`, ...), input links, NLDAS-2 forcing, LDT outputs, and the Fortran binaries `LIS_clsm_dump2`, `LIS_mp_hy` | your case directory (the author's was a private directory) |
+| `LISF_RUN` | case directories (`conus_mp5_60d`, `conus_mp5_mpi`, ...), input links, NLDAS-2 forcing, LDT outputs, and the Fortran binaries (`LIS_mp_clean`, ...) | your case directory (the author's was a private directory) |
 | `LISF_ENV` | script that sets up GNU 14.2 and the libraries (ESMF mpiuni, NetCDF, HDF) for running the Fortran binaries | `$LISF_DEPS/env_lis.sh`, with `LISF_DEPS` = directory of the GNU 14.2 dependency build |
 | `CONDA_BIN`, `JAX_ENV` | conda executable and the JAX environment (`graphcast-env`: jax 0.5.3, Python 3.10) | path of your conda executable (on Nexus, the anaconda module) |
 | (not read by the runner) build copy of LIS and LDT with patches and dump hooks | `LISF_BUILD` = directory holding `{lis,ldt}`; rebuild with `lis_patches/env_lis.sh` and `make` in `lis/make`; restore the hooks with `\cp -f` from the repo before rebuilding |
-| public LIS data | parameters (`PARAMETERS/clsm25_parms`, `HYMAP_parms/NLDAS_12.5KM`, `mos_parms`, `VIC`, ...) | `/css/lisdata-pub/data` |
+| public LIS data | parameters (the LDT inputs) | `/css/lisdata-pub/data` |
 
-Built-in knowledge for each case: CLSM needs `conus_clsm/out/lis_input.conus.clsm.nc` (made by LDT with `conus_clsm/ldt.config`); HyMAP2 needs `conus_hy/out/lis_input.conus.hymap.nc`; `conus_clsm1d/INPUT` and `out` must be working links (a dangling link made a job fail silently once).
 
-## 2. What each variant reads
+## 2. What the CONUS runs read
 
-* `pair_clsm_1d`: `conus_clsm1d` (links to `conus_clsm/INPUT` with NLDAS-2 FORA for Feb 2017, and `out/`), `LIS_clsm_dump2` with the dump hook disabled by `JAXDUMP_CLSM_MAXSTEP=0`.
-* `pair_hymap_2d`: `conus_hy` and `LIS_mp_hy`.
-* `jax_mp_7d`: `conus_mp7` and its stored Fortran output `lisout`.
+* `conus_mp5_60d`: `INPUT/` (NLDAS-2 forcing, output list), the CONUS parameter file made by LDT, the Fortran binary built from LIS 7.8 (GNU 14.2, serial), configs in `configs/conus_mp5_60d/`.
+* `conus_mp5_mpi`: the MPI build of the same LIS, configs in `configs/conus_mp5_mpi/`.
 * Sizes were not measured. The smallest subset that reproduces one case was not determined.
 
 ## 3. Cluster facts the runner assumes

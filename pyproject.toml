@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "lisf-noahmp-jax"
 version = "0.1.0"
-description = "JAX ports of NASA LISF land surface models (Noah-MP 3.6/4.0.1/5.0 first), validated against the real Fortran LIS"
+description = "JAX port of Noah-MP 5.0 from NASA LISF, validated against the real Fortran LIS"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -26,8 +26,6 @@ lisf-noahmp-jax = "lisf_noahmp_jax.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[tool.setuptools.package-data]
-"lisf_noahmp_jax.driver" = ["*.npy"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

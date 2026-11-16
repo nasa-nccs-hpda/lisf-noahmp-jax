@@ -9,21 +9,6 @@ OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 N = int(os.environ.get("N_TEST_RECORDS", "600"))
 
 
-def noah_family(case, src):
-    """jaxdump_noah39.bin layout: >i4 (NHDR, NPRE, NPOST), then records."""
-    with open(src, "rb") as f:
-        nh, npre, npost = (int(x) for x in np.fromfile(f, ">i4", 3))
-    dt = np.dtype([("hdr", ">i4", nh), ("pre", ">f4", npre), ("post", ">f4", npost)])
-    mm = np.memmap(src, dtype=dt, mode="r", offset=12)
-    rng = np.random.default_rng(7)
-    idx = np.sort(rng.choice(len(mm), N, replace=False))
-    d = os.path.join(OUT, case); os.makedirs(d, exist_ok=True)
-    with open(os.path.join(d, "jaxdump_noah39.bin"), "wb") as f:
-        np.array([nh, npre, npost], ">i4").tofile(f)
-        np.array(mm[idx]).tofile(f)
-    print(case, len(mm), "->", len(idx))
-
-
 def mp_family(case, srcdir, prefix="jaxdump_mp", n=None, ice=False, wet=False, crop=False):
     n = n or N
     names = {}
@@ -154,39 +139,14 @@ def wet_snow_family(case, srcdirs, prefix="jaxdump_mp", n_each=120):
     print(case, "->", sum(len(a) for a in parts))
 
 
-def clsm_family(case, srcdir, steps=(2, 12), ntile=1500):
-    sys.path.insert(0, os.path.join(os.path.dirname(OUT), "..", "tools", "replay"))
-    import dumpio_clsm as D
-    idx, recs, lay, dn = D.load(srcdir, maxstep=max(steps))
-    ns = len(idx)
-    rng = np.random.default_rng(7)
-    sel = np.sort(rng.choice(ns, ntile, replace=False))
-    d = os.path.join(OUT, case); os.makedirs(d, exist_ok=True)
-    arrs = {}
-    for s in steps:
-        for tag, nm in ((0, "in"), (1, "out")):
-            for k, v in recs[tag][s].items():
-                v = np.asarray(v)
-                arrs[f"{nm}{s}_{k}"] = v if v.ndim == 0 else (v[sel] if v.ndim == 1 else v[..., sel])
-    np.savez_compressed(os.path.join(d, "clsm_calls.npz"), steps=np.array(steps), **arrs)
-    print(case, ns, "->", len(sel), "tiles, steps", steps)
-
-
 if __name__ == "__main__":
-    noah_family("noah33", f"{RUN}/conus_n33_dump/jaxdump_noah39.bin")
-    noah_family("noah271", f"{RUN}/conus_n271_dump/jaxdump_noah39.bin")
     mp_family("noahmp401", RUN)
-    mp_family("noahmp36", f"{RUN}/conus_mp36_dump")
     # one small data set per Noah-MP option variant (recorded with the option changed in lis.config, 3 h CONUS dumps)
     V401 = dict(run2="conus_mp401_dump_r2", run3="conus_mp401_dump_r3", run4="conus_mp401_dump_r4", frz2="conus_mp401_dump_frz2",
                 inf2="conus_mp401_dump_inf2", crs2="conus_mp401_dump_crs2", sfc2="conus_mp401_dump_sfc2", stc2="conus_mp401_dump_stc2",
                 stc3="conus_mp401_dump_stc3", dveg3="conus_mp401_dump_dveg3", dveg1="conus_mp401_dump_dveg1")
-    V36 = dict(run2="conus_mp36_dump_r2", run4="conus_mp36_dump_r4", frz2="conus_mp36_dump_frz2", inf2="conus_mp36_dump_inf2",
-               crs2="conus_mp36_dump_crs2", sfc2="conus_mp36_dump_sfc2", stc2="conus_mp36_dump_stc2", dveg3="conus_mp36_dump_dveg3", dveg1="conus_mp36_dump_dveg1")
     for tag, d in V401.items():
         mp_family(f"noahmp401_{tag}", f"{RUN}/{d}", n=200)
-    for tag, d in V36.items():
-        mp_family(f"noahmp36_{tag}", f"{RUN}/{d}", n=200)
     # Noah-MP 5.0 (CONUS 3 h dump, snow tiles first + random; land-ice records separately); dump layout of lis_patches/make_noahmp50_hook.py
     mp_family("noahmp50", f"{RUN}/mp50_dump_conus", n=600)
     mp_family("noahmp50_sgp", f"{RUN}/mp50_dump_sgp", n=400)
@@ -216,4 +176,3 @@ if __name__ == "__main__":
     open(os.path.join(OUT, "noahmp50_crop1", "NoahmpTable.TBL"), "w").write(grp)
     # irrigation trigger 2 (crop season from the PLANTING / HARVEST maps), flood method, patched LIS build as above
     mp_family("noahmp50_irrt2", f"{RUN}/mp50v_sgp_irrt2m3", n=150)
-    clsm_family("clsm", f"{RUN}/conus_clsm_jul_d")

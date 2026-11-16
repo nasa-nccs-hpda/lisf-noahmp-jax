@@ -8,7 +8,7 @@
 #SBATCH --exclusive
 #SBATCH --mem=0
 #SBATCH --time=01:00:00
-#SBATCH --output=$LISF_RUN/conus_mp5_mpi/chk_%j.out
+#SBATCH --output=%x_%j.out
 D=$LISF_DEV
 RUN=$D/lisf_run/conus_mp5_mpi
 source $D/lisf_deps/env_gnu14.sh

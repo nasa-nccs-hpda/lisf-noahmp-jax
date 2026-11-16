@@ -38,10 +38,10 @@ jobs:
       - name: Smoke test CLI
         run: uv run --locked lisf-noahmp-jax --help
       - name: Replay subset
-        run: uv run --locked pytest -q tests/test_lai_tracker.py tests/test_ldt.py tests/test_forcing_grib.py tests/test_example_sgp.py tests/test_regression.py -k "lai or ldt or grib or forcing or example or noahmp50_snow or noahmp50_glacier"
+        run: uv run --locked pytest -q tests/test_lai_tracker.py tests/test_ldt.py tests/test_forcing_grib.py tests/test_example_sgp.py tests/test_sanity_g5.py tests/test_regression.py -k "lai or ldt or grib or forcing or example or water_balance or noahmp50_snow or noahmp50_glacier"
 
   full:
-    # all 49 regression tests (~30 min on CPU); weekly and on manual dispatch only
+    # all tests (~30 min on CPU); weekly and on manual dispatch only
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 90

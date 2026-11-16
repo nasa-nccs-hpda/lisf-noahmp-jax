@@ -10,7 +10,7 @@
 #SBATCH --mem=96G
 #SBATCH --time=02:00:00
 #SBATCH --exclusive
-#SBATCH --output=$LISFJAX_REPO/gpu_runs/conus_mp5_f64_%j.out
+#SBATCH --output=gpu_runs/conus_mp5_f64_%j.out
 RUN=$LISF_RUN/conus_mp5_60d
 S64=$F64_SRC
 CONDA=$CONDA_BIN

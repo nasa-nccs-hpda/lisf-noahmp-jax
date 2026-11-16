@@ -1,19 +1,63 @@
-"""Four slides for the code-owner meeting, rewritten 2026-11-16 for a skeptical audience (replaces owner_meeting_20261116 in content; older decks untouched).
+"""Four slides for the code-owner meeting, rewritten 2026-11-16 for a skeptical audience (earlier decks are in the git tag archive-2026-11-16).
 Structure: claim and its weak points / agreement evidence / speed evidence / what we ask. Same layout layer as the briefing decks.
 Numbers are typed in from Reports/BENCHMARKS.md, reports/discover_r_case_*.md, reports/flux_compare_mp5_60d_20261110.md, reports/flux_outliers_mp5_60d_20261111.md, reports/independent_test_20261105.md.
-usage: python3 build_owner_meeting_20261116b.py   (reportlab + Pillow, no network; a text block that does not fit raises)
+usage: python3 build_owner_meeting.py   (reportlab + Pillow, no network; a text block that does not fit raises)
 """
 import math
 import os
 import deck_layout as L
 from deck_layout import AMBER, BLUE, GREEN, INK, INK2, MUTED, ORANGE, W, MARGIN, banner, footer
-from build_briefing_decks_20261024 import _page, _cards, _metric, _save
+from reportlab.pdfgen import canvas
+from deck_layout import H, Page, card, header
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATE = "2026-11-16"
 L.FOOTER_DATE = DATE
 EYE = "OWNER MEETING | %s" % DATE
 CW, GAP = (W - 2 * MARGIN - 16) / 2, 16
+
+
+def _page(title, subtitle, eyebrow, size=23):
+    p = Page(title)
+    return p, header(p, eyebrow, title, subtitle, size)
+
+
+def _metric(p, x, y, w, h, value, label, detail, color=GREEN):
+    card(p, x, y, w, h, color)
+    p.text(x + 15, y + 6, w - 30, value, 20, INK, True, maxh=26)
+    p.text(x + 15, y + 31, w - 30, label, 9.8, INK2, True, maxh=14)
+    p.text(x + 15, y + 47, w - 30, detail, 8.8, MUTED, maxh=h - 50)
+
+
+def _cards(p, x, y, w, h, title, items, accent=BLUE, size=10.6, gap=7):
+    card(p, x, y, w, h, accent)
+    p.text(x + 15, y + 11, w - 30, title, 12.5, INK, True, maxh=22)
+    yy = y + 36
+    for it in items:
+        sub = it.startswith("> ")   # sub-bullet: indented under the item above
+        if sub:
+            it = it[2:]
+        ind = 18 if sub else 0
+        p.text(x + 16 + ind, yy, 12, "-" if sub else "+", size, accent, True)
+        yy += p.text(x + 30 + ind, yy, w - 46 - ind, it, size - (0.6 if sub else 0), INK2) + gap
+    if yy - gap > y + h:
+        L.OVERFLOWS.append("%s: card '%s' needs %.0f pt, box %.0f pt" % (p.name, title, yy - gap - y, h))
+
+
+def _save(path, title, slides):
+    L.OVERFLOWS.clear()
+    c = canvas.Canvas(path, pagesize=(W, H)); c.setTitle(title); c.setAuthor("LISF JAX port (G. Tamkin)")
+    prev = os.path.join(HERE, "preview"); os.makedirs(prev, exist_ok=True)
+    for i, make in enumerate(slides, 1):
+        p = make(i); p.to_pdf(c); p.to_png(os.path.join(prev, "slide_%02d.png" % i))
+    c.save()
+    for q in L.OVERFLOWS:
+        print("OVERFLOW:", q)
+    if L.OVERFLOWS:
+        raise RuntimeError("%d layout overflow(s) in %s" % (len(L.OVERFLOWS), path))
+    print("wrote", path, len(slides), "slides")
+
+
 
 
 def slides():
@@ -103,7 +147,7 @@ def slides():
             "R's Intel LIS is bitwise identical at 20, 32 and 40 ranks, so the fault looks to be in our build or patches, not in LIS. Not yet isolated.",
         ], ORANGE, 10.2, 7)
         banner(p, MARGIN, y + 312, W - 2 * MARGIN, 34, "A fair claim needs R's Fortran wall time on R's case. That is ask 2.", AMBER, 11)
-        footer(p, n, "Reports/BENCHMARKS.md; reports/discover_r_case_60d_20261110.md; DISCOVER_R_CASE_PLAN.md")
+        footer(p, n, "Reports/BENCHMARKS.md; reports/discover_r_case_60d_20261110.md")
         return p
 
     def s4(n):
@@ -131,11 +175,11 @@ def slides():
             "Irrigation in the runner, runoff option 5, urban, GECROS, JULES, VIC, CLM2, RUC, LDT/LVT.",
             "Water tiles of soil type 14 (148 in CONUS) are unstable in Fortran too: an input issue, masked.",
         ], ORANGE, 10, 6)
-        footer(p, n, "STATUS_20261022.md; Reports/BENCHMARKS.md; NOTICE; deliver/email_to_R_20261116.txt")
+        footer(p, n, "docs/PORT_ASSURANCE.md; docs/reports/BENCHMARKS.md; NOTICE")
         return p
 
     return [s1, s2, s3, s4]
 
 
 if __name__ == "__main__":
-    _save(os.path.join(HERE, "owner_meeting_20261116b.pdf"), "LISF on JAX: owner meeting", slides())
+    _save(os.path.join(HERE, "owner_meeting_20261116.pdf"), "LISF on JAX: owner meeting", slides())

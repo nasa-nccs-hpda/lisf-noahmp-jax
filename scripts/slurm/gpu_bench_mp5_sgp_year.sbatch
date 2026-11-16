@@ -3,7 +3,7 @@
 #SBATCH --job-name=mp5_sgp_year
 #SBATCH --partition=compute
 #SBATCH --time=04:00:00
-#SBATCH --output=$LISFJAX_REPO/gpu_runs/mp5_sgp_year_%j.out
+#SBATCH --output=gpu_runs/mp5_sgp_year_%j.out
 #SBATCH --constraint=v100
 #SBATCH --gres=gpu:1
 #SBATCH --nodes=1

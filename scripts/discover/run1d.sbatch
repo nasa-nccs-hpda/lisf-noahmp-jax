@@ -7,7 +7,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
 #SBATCH --time=02:00:00
-#SBATCH --output=$DISCOVER_WORK/jaxtest/r1d_%j.out
+#SBATCH --output=%x_%j.out
 module load python/GEOSpyD/24.11.3-0/3.12
 J=$DISCOVER_WORK/jaxtest
 R=$R_CASE

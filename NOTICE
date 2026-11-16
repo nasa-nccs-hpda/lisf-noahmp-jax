@@ -16,6 +16,6 @@ Any scholarly work associated with, related to or derived from this software mus
   "The Noah-MP modeling system was developed at the National Center for Atmospheric Research (NCAR) with collaborations from university
   partners. NCAR is sponsored by the United States National Science Foundation."
 
-The other ported models (Noah 3.x, Mosaic, CLSM) and the Fortran reference outputs come from NASA LISF (github.com/NASA-LIS/LISF, Apache-2.0),
+The Noah-MP 4.0.1 shared driver path, the LIS conventions and the Fortran reference outputs come from NASA LISF (github.com/NASA-LIS/LISF, Apache-2.0),
 Land Information System, NASA Goddard Space Flight Center. examples/sgp_5d contains cropped NLDAS-2 forcing (NASA GES DISC) and the
 Noah-MP parameter table NoahmpTable.TBL (NCAR Noah-MP, UCAR terms above).

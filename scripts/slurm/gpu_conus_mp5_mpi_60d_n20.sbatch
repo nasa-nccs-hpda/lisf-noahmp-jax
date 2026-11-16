@@ -7,7 +7,7 @@
 #SBATCH --exclusive
 #SBATCH --mem=0
 #SBATCH --time=03:00:00
-#SBATCH --output=$LISF_RUN/conus_mp5_mpi/60d_n20_%j.out
+#SBATCH --output=%x_%j.out
 D=$LISF_DEV
 RUN=$D/lisf_run/conus_mp5_mpi
 echo "host: $(hostname) cpu: $(lscpu | grep 'Model name' | sed 's/.*: *//') cores: $(nproc)"

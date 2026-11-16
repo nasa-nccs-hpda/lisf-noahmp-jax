@@ -8,7 +8,11 @@ from lisf_noahmp_jax.driver import params_mp50
 
 from lisf_noahmp_jax.driver import mp_tables as T_
 f32 = np.float32
-TABLE = os.path.join(os.environ["LISF_BUILD"], "lis/surfacemodels/land/noahmp.5.0/phys/noahmp/parameters/NoahmpTable.TBL")
+# parameter table: the LISF build's copy if LISF_BUILD is set, else the identical copy shipped in the example
+_REPO = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
+TABLE = os.path.join(os.environ.get("LISF_BUILD", ""), "lis/surfacemodels/land/noahmp.5.0/phys/noahmp/parameters/NoahmpTable.TBL")
+if not os.path.exists(TABLE):
+    TABLE = os.path.join(_REPO, "examples", "sgp_5d", "NoahmpTable.TBL")
 _load_raw = dumpio_mp.load            # the real loader (replay_mp50.py replaces dumpio_mp.load by load50)
 
 

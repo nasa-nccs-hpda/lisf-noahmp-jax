@@ -16,7 +16,7 @@ LIMITS = dict(Swnet_inst=2e-3, Lwnet_inst=3.0, Qle_inst=0.2, Qh_inst=20.0, Qg_in
 def test_example_sgp_5d(tmp_path):
     case = tmp_path / "sgp_5d"
     shutil.copytree(EX, case, ignore=shutil.ignore_patterns("out", "reference"))
-    env = dict(os.environ, JAX_PLATFORMS="cpu")
+    env = dict(os.environ, JAX_PLATFORMS=os.environ.get("JAX_PLATFORMS", "cpu"))
     r = subprocess.run([sys.executable, "-c", "from lisf_noahmp_jax.cli import main; main()", "-C", str(case), str(case / "lis.config")],
                        env=env, capture_output=True, text=True)
     assert r.returncode == 0, r.stderr[-2000:]

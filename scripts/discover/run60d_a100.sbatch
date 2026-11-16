@@ -7,10 +7,10 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
 #SBATCH --time=02:00:00
-#SBATCH --output=/discover/nobackup/gtamkin/jaxtest/r60a100_%j.out
+#SBATCH --output=$DISCOVER_WORK/jaxtest/r60a100_%j.out
 module load python/GEOSpyD/24.11.3-0/3.12
-J=/discover/nobackup/gtamkin/jaxtest
-R=/discover/nobackup/projects/eis_freshwater/rabolafi/V5_testing/NLDAS2-v5-testing-OL
+J=$DISCOVER_WORK/jaxtest
+R=$R_CASE
 rm -rf $J/out_60d_a100; mkdir -p $J/out_60d_a100
 python3 $J/mkcfg.py $R/lis.config.nldas2.Basic.OL $J/cfg_60d_a100 2008 11 30 $J/out_60d_a100
 nvidia-smi -L

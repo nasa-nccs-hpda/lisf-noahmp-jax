@@ -1,4 +1,4 @@
---- /panfs/ccds02/nobackup/people/gtamkin/dev/lisf_build/noah39_main.F90.orig	2026-10-21 22:39:41.850249487 -0400
+--- $LISF_BUILD/noah39_main.F90.orig	2026-10-21 22:39:41.850249487 -0400
 +++ noah39_main.F90	2026-10-22 00:39:53.617340902 -0400
 @@ -42,6 +42,7 @@
    use module_sfcdif_wrf_39, only: SFCDIF_MYJ

@@ -3,8 +3,8 @@ usage: python lis/variants50.py TAG KEY=VALUE [KEY=VALUE ...] [--domain sgp|conu
 KEY is (@label for a raw config label) the option label of the LIS config without the 'Noah-MP.5.0 ' prefix and without the colon, e.g. 'surface layer drag coefficient option=2'.
 SGP: Feb 1 2017 (env VAR_DAY=n: Feb n) (24 h, 616 tiles, mostly snow free); CONUS: Feb 1 0-3 h, snow tiles only (JAXDUMP_SNOWONLY, 12 steps)."""
 import os, re, subprocess, sys
-RUN = os.environ.get("LISF_RUN", "/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run")
-ENV = "/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_deps/env_lis.sh"
+RUN = os.environ["LISF_RUN"]
+ENV = os.path.join(os.environ["LISF_DEPS"], "env_lis.sh")
 HERE = os.path.dirname(os.path.abspath(__file__)); PROJ = os.path.dirname(HERE)
 FIELDS = "TV TG FSH SSOIL SMC STC SWE PSN RUNSB TAH".split()
 

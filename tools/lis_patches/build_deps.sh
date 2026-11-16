@@ -1,7 +1,7 @@
 #!/bin/bash
 # Build HDF5, netCDF-C, netCDF-Fortran, ecCodes and ESMF (mpiuni) with GNU 14 into $DEPS/install.
 set -e
-source /panfs/ccds02/nobackup/people/gtamkin/dev/lisf_deps/env_gnu14.sh
+source $LISF_DEPS/env_gnu14.sh
 cd $DEPS/src; P=$DEPS/install; mkdir -p $P; J=8
 step() { echo "=== $(date +%T) $1"; }
 if [ ! -f $P/lib/libhdf5.so ]; then step hdf5; tar xzf hdf5-1.14.4-3.tar.gz; cd hdf5-1.14.4-3; ./configure --prefix=$P --enable-fortran --enable-shared >../hdf5.log 2>&1; make -j$J >>../hdf5.log 2>&1; make install >>../hdf5.log 2>&1; cd ..; fi

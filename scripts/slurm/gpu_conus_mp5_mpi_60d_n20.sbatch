@@ -7,8 +7,8 @@
 #SBATCH --exclusive
 #SBATCH --mem=0
 #SBATCH --time=03:00:00
-#SBATCH --output=/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run/conus_mp5_mpi/60d_n20_%j.out
-D=/panfs/ccds02/nobackup/people/gtamkin/dev
+#SBATCH --output=$LISF_RUN/conus_mp5_mpi/60d_n20_%j.out
+D=$LISF_DEV
 RUN=$D/lisf_run/conus_mp5_mpi
 echo "host: $(hostname) cpu: $(lscpu | grep 'Model name' | sed 's/.*: *//') cores: $(nproc)"
 source $D/lisf_deps/env_gnu14.sh

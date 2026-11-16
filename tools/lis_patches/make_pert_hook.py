@@ -1,6 +1,7 @@
 """Debug hook (not part of LISF): dump the forcing perturbation arrays after every get_pert call of the GMAO scheme."""
+import os
 import sys
-BUILD = '/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_build/lis/dataassim/perturb/gmaopert/gmaopert_Mod.F90'
+BUILD = os.path.join(os.environ["LISF_BUILD"], "lis/dataassim/perturb/gmaopert/gmaopert_Mod.F90")
 src = open(BUILD).read()
 if 'jdp_dump' in src:
     sys.exit('already applied')

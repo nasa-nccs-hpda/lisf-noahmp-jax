@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 SUF="${1:-}"; shift || true
 source /usr/share/lmod/lmod/init/bash
 module load intel/2020Update4
-export PATH=/panfs/ccds02/app/modules/intel/platform/x86_64/rhel/8.6/2020Update4/compilers_and_libraries_2020.4.304/linux/bin/intel64:$PATH
+export PATH=$INTEL_BIN:$PATH
 P=../../lis/surfacemodels/land/noah.3.9/phys
 OPT="${@:--O2}"
 FLAGS="$OPT -ftz -assume protect_parens -fp-model strict -fpp"

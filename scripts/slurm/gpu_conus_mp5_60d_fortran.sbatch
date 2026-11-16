@@ -7,10 +7,10 @@
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=32G
 #SBATCH --time=16:00:00
-#SBATCH --output=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lisf-noahmp-jax/gpu_runs/conus_mp5_60d_fortran_%j.out
-RUN=/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run/conus_mp5_60d
+#SBATCH --output=$LISFJAX_REPO/gpu_runs/conus_mp5_60d_fortran_%j.out
+RUN=$LISF_RUN/conus_mp5_60d
 echo "host: $(hostname) cpu: $(lscpu | grep 'Model name' | sed 's/.*: *//')"
-source /panfs/ccds02/nobackup/people/gtamkin/dev/lisf_deps/env_lis.sh
+source $LISF_DEPS/env_lis.sh
 cd $RUN; \rm -rf lisout
-/usr/bin/time -v /panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run/LIS_mp_clean -f lis.config.fortran > lis.fortran.out 2> lis.fortran.time
+/usr/bin/time -v $LISF_RUN/LIS_mp_clean -f lis.config.fortran > lis.fortran.out 2> lis.fortran.time
 grep -E "Elapsed|Maximum resident|User time" lis.fortran.time; tail -1 lisout/lislog.0000

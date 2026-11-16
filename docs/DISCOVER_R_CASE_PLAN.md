@@ -3,7 +3,7 @@
 Status: PLAN, recon done 2026-11-10, no JAX run yet. Owner: G. Tamkin. Replaces the generic `DISCOVER_TEST.md` for this case.
 
 ## 1. What R provided (read on Discover 2026-11-10, read-only)
-Directory `/discover/nobackup/projects/eis_freshwater/rabolafi/V5_testing/NLDAS2-v5-testing-OL/` (group s2443, readable by gtamkin).
+Directory `$R_CASE/` (group s2443, readable by gtamkin).
 | Item | Value |
 |---|---|
 | Run | LIS 7.8 (module `lisf_7.8_intel_2025.3.2`), `Noah-MP.5.0`, retrospective, open loop |
@@ -36,7 +36,7 @@ Venv on Discover: Python 3.12.9 (GEOSpyD module, system site packages for pygrib
 ## 3d. Status 2026-11-10 (Discover)
 - Parameters: `SetupMP50` builds from R's config and `lis_input.nldas2.noahmp401.OL.nc` (login node, CPU): 76,180 tiles, lat 25.0625-52.9375, lon -124.9375 to -67.0625, same tile count as our CONUS case (`scripts/discover/setup_check.py`).
 - A100 jobs: `gpu_a100` accepts a job only with `-C rome` and a time limit above 1 h (nodes carry features `rome,edr,cssro,notshort`); without them `sbatch` fails with "Requested node configuration is not available" even though `--test-only` passes. Account `ilab`, `--gres=gpu:1 -c 16`. Queue estimate on the day: start about 18:58.
-- 1-day JAX run (2008-10-01 to 10-02, hourly history): job 59223727, `scripts/discover/run1d.sbatch` (`sbatch -C rome`), output `/discover/nobackup/gtamkin/jaxtest/out_1d`, log `r1d_<jobid>.out`. Compare with R's history files using `driver/compare_hist.py`.
+- 1-day JAX run (2008-10-01 to 10-02, hourly history): job 59223727, `scripts/discover/run1d.sbatch` (`sbatch -C rome`), output `$DISCOVER_WORK/jaxtest/out_1d`, log `r1d_<jobid>.out`. Compare with R's history files using `driver/compare_hist.py`.
 - First A100 job (59223727) ran 21 s and failed: JAX could not load its CUDA libraries ("Error loading CUDA libraries. GPU will not be used", then "DNN library initialization failed"). Cause: the venv was created with `--system-site-packages`, so pip found the NVIDIA wheels in the GEOSpyD base environment and did not install them into the venv; the JAX CUDA plugin looks for them inside its own site-packages. Fix: a clean `venv2` (no system packages: `pip install 'jax[cuda12]>=0.5,<0.6'` then `pip install -e '.[grib]'`; pygrib 2.1.8 ships a wheel with eccodes). Versions in venv2: jax 0.5.3, numpy 2.5.4, pygrib 2.1.8, netCDF4 1.7.5, cudnn 9.28. The scripts now set `JAX_PLATFORMS=cuda` so a missing GPU fails instead of falling back to CPU. Retry: job 59224273 (pending, priority).
 - Typing into the shared screen session: commands over about 250 characters, `^`, `#`, a trailing `&` before the marker and `\n` in sed all break; scripts go over as base64 lines or via `git pull` (works without a prompt).
 
@@ -47,7 +47,7 @@ Forcing bitwise identical (5 fields x 24 h), state p99 at float32 level (SWE 1e-
 | # | Stage | Done when | Needs |
 |---|---|---|---|
 | 0 | Recon (done) | facts in section 1 | |
-| 1 | Put the repo on Discover (`git clone` over HTTPS needs a GitHub credential entered by the user; or the user copies a tarball) | `git log` shows the commit; `pip install ".[test]"` into a venv under `/discover/nobackup/gtamkin/venvs` | user credential |
+| 1 | Put the repo on Discover (`git clone` over HTTPS needs a GitHub credential entered by the user; or the user copies a tarball) | `git log` shows the commit; `pip install ".[test]"` into a venv under `$DISCOVER_WORK/venvs` | user credential |
 | 2 | Environment: venv with `jax[cuda12]>=0.5,<0.6`, netCDF4, a GRIB reader; test on a `gpu_a100` allocation (not the login node) | `python -c "import jax; jax.devices()"` shows an A100 | |
 | 3 | Fortran reference check: confirm the existing output is complete for the window we compare (first 1-3 days, then 60 days from 2008-10-01), copy only the needed hourly files (or read in place) | file count and checksums noted; the run's actual stop reason found in `lis.59119005.out` / `noahmp.err` | |
 | 4 | GRIB forcing reader in the JAX driver (done, synthetic-tested) and variable mapping to our 11 forcing fields; verify one hour against the Fortran forcing diagnostics in the history files (`Tair_f_inst` etc.): must match bitwise, as in the NetCDF case | forcing test passes for 24 h | decision: reader vs conversion |

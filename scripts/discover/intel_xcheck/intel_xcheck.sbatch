@@ -7,10 +7,10 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=40
 #SBATCH --time=03:00:00
-#SBATCH --output=/discover/nobackup/gtamkin/jaxtest/intelx_%j.out
+#SBATCH --output=$DISCOVER_WORK/jaxtest/intelx_%j.out
 # R's Intel-built LIS 7.8, R's Noah-MP 5.0 NLDAS-2 case, NetCDF NLDAS-2.0 reader on GRIB-converted files, 1-6 Oct 2008, at 20, 32 and 40 ranks.
-J=/discover/nobackup/gtamkin/jaxtest
-R=/discover/nobackup/projects/eis_freshwater/rabolafi/V5_testing/NLDAS2-v5-testing-OL
+J=$DISCOVER_WORK/jaxtest
+R=$R_CASE
 G=/discover/nobackup/projects/lis/MET_FORCING/NLDAS2.FORCING
 X=$J/intel
 mkdir -p $X; cd $X

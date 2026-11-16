@@ -11,7 +11,7 @@
    if(LIS_masterproc) then
 # (second HYMAP3_routing_writerst.F90 fix, same file: the "do m=" line was inside #if SPMD only, leaving an unmatched enddo in serial builds;
 #  moved "do m=1,LIS_rc%nensem(n)" above "#if (defined SPMD)")
---- /panfs/ccds02/nobackup/people/gtamkin/dev/lisf_build/_ssmis.orig	2026-10-21 23:38:32.438276453 -0400
+--- $LISF_BUILD/_ssmis.orig	2026-10-21 23:38:32.438276453 -0400
 +++ USAFSI/USAFSI_ssmisMod.F90	2026-10-21 23:38:32.451819999 -0400
 @@ -401,7 +401,7 @@
     ! Dummy version if no ECCODES support was compiled

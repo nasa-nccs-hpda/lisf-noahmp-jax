@@ -1,5 +1,5 @@
 # Environment to configure/compile/run LIS with GNU 14 (serial, ESMF mpiuni). Source after env_gnu14.sh.
-source /panfs/ccds02/nobackup/people/gtamkin/dev/lisf_deps/env_gnu14.sh
+source $LISF_DEPS/env_gnu14.sh
 export LIS_ARCH=linux_gfortran
 export LIS_FC=gfortran
 export LIS_CC=gcc

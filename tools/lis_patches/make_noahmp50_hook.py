@@ -4,10 +4,11 @@ all NoahmpIO scalars of interest, all NoahmpIO (i,j) and (i,k,j) arrays of the L
 LisNoahmpParam_type structure (names 'p_<NAME>', the same names as the 4.0.1 hook). Output: jaxdump_mp.bin + jaxdump_mp_{pre,post}.layout in the run directory,
 read by lis/dumpio_mp.py. Environment switches (read at run time): JAXDUMP_MAXSTEP=n records only the first n time steps; JAXDUMP_SNOWONLY=1 keeps snow tiles.
 usage: python3 make_noahmp50_hook.py [build_dir]   (default: the author's build copy)"""
+import os
 import re, sys, os, shutil
 
 _args = [a for a in sys.argv[1:] if not a.startswith("--")]
-BUILD = _args[0] if _args else "/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_build/lis/surfacemodels/land/noahmp.5.0/phys/noahmp/drivers/lis/"
+BUILD = _args[0] if _args else os.path.join(os.environ["LISF_BUILD"], "lis/surfacemodels/land/noahmp.5.0/phys/noahmp/drivers/lis/")
 path = BUILD + "NoahmpDriverMainMod.F90"
 if not os.path.exists(path + ".orig"):
     shutil.copy(path, path + ".orig")

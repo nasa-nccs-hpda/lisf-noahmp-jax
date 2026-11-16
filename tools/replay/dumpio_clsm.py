@@ -2,7 +2,7 @@
 import re
 import numpy as np
 
-SRC = "/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lis/surfacemodels/land/clsm.f2.5/clsmf25_model.F90"
+SRC = os.path.join(os.environ["LISF_DEV"], "ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lis/surfacemodels/land/clsm.f2.5/clsmf25_model.F90")
 
 
 def dummy_names():

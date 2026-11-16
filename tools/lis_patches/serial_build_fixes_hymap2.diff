@@ -1,4 +1,4 @@
---- /panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lis/routing/HYMAP2_router/HYMAP2_routingMod.F90	2026-10-21 19:21:20.430503148 -0400
+--- $LISF_DEV/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lis/routing/HYMAP2_router/HYMAP2_routingMod.F90	2026-10-21 19:21:20.430503148 -0400
 +++ routing/HYMAP2_router/HYMAP2_routingMod.F90	2026-10-22 04:14:46.741170186 -0400
 @@ -693,6 +693,7 @@
  
@@ -38,7 +38,7 @@
  #endif
    !rearrange them to be in correct order.
    do l=1,LIS_npes
---- /panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lis/routing/HYMAP2_router/HYMAP2_model_core.F90	2026-10-21 19:21:20.415812062 -0400
+--- $LISF_DEV/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lis/routing/HYMAP2_router/HYMAP2_model_core.F90	2026-10-21 19:21:20.415812062 -0400
 +++ routing/HYMAP2_router/HYMAP2_model_core.F90	2026-10-22 04:14:46.748132321 -0400
 @@ -615,6 +615,8 @@
         LIS_routing_gdeltas(n,:),&

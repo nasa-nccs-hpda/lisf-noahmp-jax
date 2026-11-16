@@ -9,14 +9,14 @@
 #SBATCH --mem=96G
 #SBATCH --time=03:00:00
 #SBATCH --exclusive
-#SBATCH --output=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lisf-noahmp-jax/gpu_runs/clsm_bench_%j.out
-JP=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lisf-noahmp-jax
-RUN=/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run
-CONDA=/panfs/ccds02/app/modules/anaconda/platform/x86_64/rhel/8.6/3-2022.05/bin/conda
+#SBATCH --output=$LISFJAX_REPO/gpu_runs/clsm_bench_%j.out
+JP=$LISFJAX_REPO
+RUN=$LISF_RUN
+CONDA=$CONDA_BIN
 echo "host: $(hostname) gpu: $(nvidia-smi --query-gpu=name,driver_version --format=csv,noheader | head -1) cpu: $(lscpu | grep 'Model name' | sed 's/.*: *//')"
 cd $RUN/conus_clsm1d
 echo "=== Fortran LIS, 1 day (dump hook disabled with JAXDUMP_CLSM_MAXSTEP=0)"
-( source /panfs/ccds02/nobackup/people/gtamkin/dev/lisf_deps/env_lis.sh
+( source $LISF_DEPS/env_lis.sh
   mkdir -p lisout; export JAXDUMP_CLSM_MAXSTEP=0
   /usr/bin/time -v $RUN/LIS_clsm_dump2 -f lis.config > lis.out 2> lis.time
   grep -E "Elapsed|Maximum resident|User time" lis.time; tail -1 lisout/lislog.0000 )

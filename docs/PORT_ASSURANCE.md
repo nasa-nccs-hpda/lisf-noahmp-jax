@@ -32,10 +32,10 @@ Purpose: one repeatable way to say how far a JAX port of a Fortran model can be 
 | 2 Reviewed | Owners reviewed physics and thresholds | Level 1 + part of G6 (review) |
 | 3 Ratified | Independently reproduced; claims fair | Level 2 + G6 reproduction + G7 |
 
-## Scorecard (as of 2026-11-03; honest, author-assessed)
+## Scorecard (as of 2026-11-03; Noah-MP 5.0 row updated 2026-11-17; honest, author-assessed)
 | Port | G0 | G1 | G2 | G3 | G4 | G5 | G6 | G7 | G8 | Level |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Noah-MP 5.0 (LIS 7.8 pin) | yes | yes | most options; gaps listed | 60 d independent, 150 d partly from JAX restarts | partial (one-ulp, 46-50/200 overlap) | not systematic | no | serial only; MPI pending | configs outside repo | 1 (cases listed) |
+| Noah-MP 5.0 (LIS 7.8 pin) | yes | yes | most options; gaps listed | 60 d independent, 150 d partly from JAX restarts | partial (one-ulp, 46-50/200 overlap) | yes (2026-11-17): NaN/range/energy on the SGP example, water balance on replay, both no worse than Fortran | no | serial and 20/40-core MPI (one run each) | partial: configs in `configs/`, example and replay tables reproduce from a clean checkout; CONUS tables need external data and our Fortran build | 1 (cases listed; G8 partial) |
 | Noah-MP 4.0.1 | yes | yes | yes | CONUS 89 d | one-ulp done | not systematic | no | serial only | partial | 1 |
 | CLSM F2.5 | yes | yes (76,088 tiles) | partial | 1 day | chaos shown | not systematic | no | serial only | partial | 0-1 |
 | Noah-MP 5.2.1 deltas | pin chosen | no | no | no | no | no | no | no | no | not started |
@@ -46,4 +46,4 @@ Purpose: one repeatable way to say how far a JAX port of a Fortran model can be 
 ## What would move the current ports up
 - Level 2: owner reviews `noahmp50_jax.py` against the pinned NCAR code and agrees the thresholds.
 - Level 3: a second person reproduces the 60 d CONUS run and tests; parallel LIS baseline (in progress); fix the water-soil tiles in the inputs.
-- Cheapest gap closers on our side: balance/NaN checks (G5), configs into the repo (G8).
+- Closed 2026-11-17: balance/NaN/range checks (G5: `driver/sanity.py`, `tests/test_sanity_g5.py`, run in `tests/test_example_sgp.py`) and configs in the repo (G8: `configs/`; absolute paths replaced by environment variables, see `docs/DATA_AND_PATHS.md`). Still open for G8: the CONUS tables cannot be rebuilt from the repository alone (data and Fortran builds live outside). G5 limits: the JAX history has no TWS or instantaneous runoff, so water balance is checked per step on replay data, not over closed-loop runs.

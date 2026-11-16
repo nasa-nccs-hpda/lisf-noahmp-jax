@@ -2,13 +2,14 @@
 Case: Noah-MP 5.0, Southern Great Plains 0.25 deg domain (28 x 22 cells), 2017-01-01 to 01-06, 15-min step, 6-hourly output, cold start.
 Contents: lis.config (relative paths), LDT parameter file, NoahmpTable.TBL, output list, NLDAS-2 hourly forcing cut to the domain (full NLDAS grid, fill value
 elsewhere, zlib), and the real Fortran LIS 7.8 history files for the same run (reference/). usage: python3 make_sgp_example.py"""
+import os
 import glob, os, re, shutil
 import numpy as np
 import netCDF4 as nc
 
-RUN = os.environ.get("LISF_RUN", "/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run")
+RUN = os.environ["LISF_RUN"]
 FORA = "/css/nldas/NLDAS2/FORA"
-TBL = "/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_build/lis/surfacemodels/land/noahmp.5.0/phys/noahmp/parameters/NoahmpTable.TBL"
+TBL = os.path.join(os.environ["LISF_BUILD"], "lis/surfacemodels/land/noahmp.5.0/phys/noahmp/parameters/NoahmpTable.TBL")
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "examples", "sgp_5d")
 VARS = ("Tair", "Qair", "PSurf", "Wind_E", "Wind_N", "LWdown", "SWdown", "Rainf")
 END_DAY = 6

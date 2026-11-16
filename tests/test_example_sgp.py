@@ -35,3 +35,7 @@ def test_example_sgp_5d(tmp_path):
         e = np.concatenate(errs[k])
         assert e.size > 0, k
         assert np.percentile(e, 99) <= lim, f"{k}: p99 error {np.percentile(e, 99):.3g} above {lim:g}"
+
+    from lisf_noahmp_jax.driver import sanity     # G5: NaN/Inf, range and energy residual no worse than the Fortran reference
+    ok, txt = sanity.report(os.path.join(EX, "reference"), str(case / "out"))
+    assert ok, txt

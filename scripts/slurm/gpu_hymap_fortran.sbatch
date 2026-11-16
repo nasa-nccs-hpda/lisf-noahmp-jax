@@ -9,10 +9,10 @@
 #SBATCH --mem=32G
 #SBATCH --time=04:00:00
 #SBATCH --exclusive
-#SBATCH --output=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lisf-noahmp-jax/gpu_runs/hymap_fortran_%j.out
-RUN=/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run
+#SBATCH --output=$LISFJAX_REPO/gpu_runs/hymap_fortran_%j.out
+RUN=$LISF_RUN
 echo "host: $(hostname) cpu: $(lscpu | grep 'Model name' | sed 's/.*: *//')"
-source /panfs/ccds02/nobackup/people/gtamkin/dev/lisf_deps/env_lis.sh
+source $LISF_DEPS/env_lis.sh
 cd $RUN/conus_hy && rm -rf lisout_f && mkdir -p lisout_f
 sed 's#\./lisout#./lisout_f#g' lis.config > lis.config.f
 /usr/bin/time -v $RUN/LIS_mp_hy -f lis.config.f > lis.f.out 2> lis.f.time

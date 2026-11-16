@@ -1,6 +1,7 @@
 """Apply the Noah-MP 4.0.1 dump hook to the BUILD COPY of module_sf_noahmpdrv_401.F90 (never the repo)."""
+import os
 import sys, re
-BUILD = '/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_build/lis/surfacemodels/land/noahmp.4.0.1/phys/'
+BUILD = os.path.join(os.environ["LISF_BUILD"], "lis/surfacemodels/land/noahmp.4.0.1/phys/")
 path = BUILD + 'module_sf_noahmpdrv_401.F90'
 src = open(path).read()
 if 'jdm_begin' in src:

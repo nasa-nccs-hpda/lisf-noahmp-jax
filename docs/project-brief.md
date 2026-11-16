@@ -23,7 +23,7 @@ Users: LIS/Noah-MP owners and customers evaluating GPU land-surface modeling. De
 
 ## Acceptance criteria
 
-Defined by the port assurance protocol (docs/PORT_ASSURANCE.md): gates G0-G8, ratification Level 1 reached for Noah-MP 5.0/4.0.1 on named cases; Level 2-3 need owner review and independent reproduction.
+Defined by the port assurance protocol (docs/PORT_ASSURANCE.md): gates G0-G8, ratification Level 1 reached for Noah-MP 5.0/4.0.1 on named cases (G8 provenance partial: CONUS tables need external data); Level 2-3 need owner review and independent reproduction.
 Distinguish example behavior from the client's required functionality.
 
 ## Decisions and dependencies

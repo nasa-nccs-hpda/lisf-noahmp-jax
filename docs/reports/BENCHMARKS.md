@@ -213,7 +213,7 @@ Same domain, forcing and physics. Fortran = real LIS 7.8, GNU 14.2 -O2. MPI = MP
 | JAX | 1 V100 GPU | 255 s (includes about 90 s compile; steady state 2.7 s per simulated day) | 1x |
 
 MPI scaling (5-day case, same binary): 1 rank 3,331 s (55:31); 40 ranks 172 s (2:52); 19.4x faster than 1 rank, flattening above about 32 ranks (earlier 4/8/16/32 rank points in `lisf_run/conus_mp5_mpi/lis.n*.time`).
-How to read it: **172x is the speed-up against one core. The fair comparison for an operational run on one node is 8.7x against 40 cores.** The ratio against a larger MPI run (several nodes) would be smaller still; not measured. Each configuration was run once; I/O on shared storage adds noise. Output agreement of the MPI run with serial Fortran was not checked here (speed comparison only).
+How to read it: **172x is the speed-up against one core. The fair claim is 12.1x against 20 cores, where the output is verified identical; 8.7x against 40 cores is the least favourable ratio, but that Fortran run has wrong output in 2.7% of tiles (open fault in our build).** The ratio against a larger MPI run (several nodes) would be smaller still; not measured. Each configuration was run once; I/O on shared storage adds noise. Output agreement of the MPI run with serial Fortran was not checked here (speed comparison only).
 
 ## MPI (40 ranks) vs serial Fortran, 60 days: agreement check (2026-11-04)
 Serial `conus_mp5_60d/lisout` vs MPI `conus_mp5_mpi/lisout_60d_n40`, 240 history files, `compare_hist.py` (full table: `cmp_mpi40_vs_serial_60d_20261104.txt`).

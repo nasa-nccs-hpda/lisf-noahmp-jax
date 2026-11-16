@@ -7,9 +7,9 @@
 #SBATCH --exclusive
 #SBATCH --mem=0
 #SBATCH --time=03:00:00
-#SBATCH --output=/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run/mp50_evt0201/dump_%j.out
-D=/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run/mp50_evt0201
+#SBATCH --output=$LISF_RUN/mp50_evt0201/dump_%j.out
+D=$LISF_RUN/mp50_evt0201
 cd $D
-source /panfs/ccds02/nobackup/people/gtamkin/dev/lisf_deps/env_lis.sh
+source $LISF_DEPS/env_lis.sh
 \rm -f jaxdump*; \rm -rf lisout; mkdir lisout
-JAXDUMP_SNOWONLY=1 JAXDUMP_MAXSTEP=72 /panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run/LIS_mp50_dump -f lis.config > lis.out 2>&1; tail -1 lisout/lislog.0000; ls -la jaxdump_mp.bin
+JAXDUMP_SNOWONLY=1 JAXDUMP_MAXSTEP=72 $LISF_RUN/LIS_mp50_dump -f lis.config > lis.out 2>&1; tail -1 lisout/lislog.0000; ls -la jaxdump_mp.bin

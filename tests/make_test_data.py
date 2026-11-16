@@ -4,7 +4,7 @@ usage: python tests/make_test_data.py        (needs the dumps under $LISF_RUN, s
 import os, sys, shutil
 import numpy as np
 
-RUN = os.environ.get("LISF_RUN", "/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run")
+RUN = os.environ.get("LISF_RUN", "")
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 N = int(os.environ.get("N_TEST_RECORDS", "600"))
 

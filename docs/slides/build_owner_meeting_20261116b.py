@@ -23,7 +23,7 @@ def slides():
         mw = (W - 2 * MARGIN) / 4
         for i, (v, lab, det, col) in enumerate([
                 ("172x", "faster than 1 Fortran core", "CONUS, 60 days, Noah-MP 5.0: 43,900 s to 255 s on one V100", GREEN),
-                ("12.1x", "faster than 20-core MPI", "3,092 s Fortran; its output is bitwise identical to serial", GREEN),
+                ("12.1x", "faster than 20-core MPI", "3,092 s, output verified identical. 8.7x vs 40 cores (output wrong in 2.7% of tiles)", GREEN),
                 ("99%", "of tile-values at float32 noise", "CONUS p99: SWE 0.023 mm, soil T 0.021 K", GREEN),
                 ("480 / 480", "input files bitwise identical", "Weather read from GRIB equals the Fortran output, on R's case", GREEN)]):
             _metric(p, MARGIN + i * mw, y + 4, mw - 8, 84, v, lab, det, col)
@@ -84,9 +84,10 @@ def slides():
             p.text(bx + w + 8, yy + 3, 170, txt, 9.6, INK2, maxh=14)
         p.text(MARGIN, y + 2, 500, "CONUS, Noah-MP 5.0, 60 days, 0.125 deg (log scale)", 10.6, GREEN, True, maxh=16)
         bar(y + 30, "Fortran, 1 core", 43900, ORANGE, "43,900 s (12 h)")
-        bar(y + 60, "Fortran, 20-core MPI", 3092, ORANGE, "3,092 s (52 min)")
-        bar(y + 90, "JAX, 1 V100", 255, GREEN, "255 s: 172x / 12.1x")
-        p.text(MARGIN, y + 124, 520, "Fortran = LIS 7.8, GNU 14.2, our build. MPI output is bitwise identical to serial.", 9, MUTED, maxh=24)
+        bar(y + 60, "Fortran, 20-core MPI", 3092, ORANGE, "3,092 s (52 min), output verified")
+        bar(y + 90, "Fortran, 40-core MPI", 2207, ORANGE, "2,207 s (37 min), output not clean")
+        bar(y + 120, "JAX, 1 V100", 255, GREEN, "255 s: 172x / 12.1x / 8.7x")
+        p.text(MARGIN, y + 150, 520, "Fortran = LIS 7.8, GNU 14.2, our build. 20-core output is bitwise identical to serial; the 40-core run is wrong in 2.7% of tiles (our build).", 9, MUTED, maxh=24)
         _cards(p, MARGIN + 570, y + 4, W - 2 * MARGIN - 570, 160, "R'S CASE (DISCOVER)", [
             "A100: 253 s = 113 s compile + 104 s GRIB read + 8.5 s model.",
             "16 CPU cores: 17 min 55 s.",

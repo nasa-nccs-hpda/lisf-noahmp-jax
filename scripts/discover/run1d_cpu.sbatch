@@ -6,10 +6,10 @@
 #SBATCH --qos=serial
 #SBATCH --cpus-per-task=16
 #SBATCH --time=02:00:00
-#SBATCH --output=/discover/nobackup/gtamkin/jaxtest/r1dcpu_%j.out
+#SBATCH --output=$DISCOVER_WORK/jaxtest/r1dcpu_%j.out
 module load python/GEOSpyD/24.11.3-0/3.12
-J=/discover/nobackup/gtamkin/jaxtest
-R=/discover/nobackup/projects/eis_freshwater/rabolafi/V5_testing/NLDAS2-v5-testing-OL
+J=$DISCOVER_WORK/jaxtest
+R=$R_CASE
 rm -rf $J/out_1d_cpu; mkdir -p $J/out_1d_cpu
 python3 $J/mkcfg.py $R/lis.config.nldas2.Basic.OL $J/cfg_1d_cpu 2008 10 2 $J/out_1d_cpu
 export LISJAX_FORCING_PROCS=8 JAX_PLATFORMS=cpu

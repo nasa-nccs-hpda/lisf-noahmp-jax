@@ -7,8 +7,8 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=16
 #SBATCH --time=01:30:00
-#SBATCH --output=/discover/nobackup/gtamkin/tbcheck/tb_a100_%j.out
-W=/discover/nobackup/gtamkin/tbcheck; cd $W/lisf-noahmp-jax
+#SBATCH --output=$DISCOVER_WORK/tbcheck/tb_a100_%j.out
+W=$DISCOVER_WORK/tbcheck; cd $W/lisf-noahmp-jax
 echo "host: $(hostname)"; nvidia-smi -L; export JAX_PLATFORMS=cuda
 $W/uvenv/bin/python -c "import jax; print(jax.devices())"
 /usr/bin/time -v $W/uvenv/bin/python -m pytest -q tests/test_example_sgp.py -p no:cacheprovider

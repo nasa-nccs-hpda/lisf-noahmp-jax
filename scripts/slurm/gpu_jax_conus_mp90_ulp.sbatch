@@ -10,11 +10,11 @@
 #SBATCH --mem=96G
 #SBATCH --time=02:00:00
 #SBATCH --exclusive
-#SBATCH --output=/panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lisf-noahmp-jax/gpu_runs/conus_mp90/jax90_ulp_%j.out
-RUN=/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run/conus_mp90
-CONDA=/panfs/ccds02/app/modules/anaconda/platform/x86_64/rhel/8.6/3-2022.05/bin/conda
+#SBATCH --output=$LISFJAX_REPO/gpu_runs/conus_mp90/jax90_ulp_%j.out
+RUN=$LISF_RUN/conus_mp90
+CONDA=$CONDA_BIN
 echo "host: $(hostname) gpu: $(nvidia-smi --query-gpu=name --format=csv,noheader | head -1)"
-cd /panfs/ccds02/nobackup/people/gtamkin/dev/ilab-agentic-ai/ilab-agentic-ai/projects/LISF/lisf-noahmp-jax
+cd $LISFJAX_REPO
 export OMP_NUM_THREADS=1; export LISJAX_ULP_TAIR=1
 unset JAX_COMPILATION_CACHE_DIR XLA_FLAGS
 \rm -rf $RUN/jaxout_ulp

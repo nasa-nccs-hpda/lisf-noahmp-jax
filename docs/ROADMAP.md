@@ -32,7 +32,7 @@ Last updated: 2026-11-05 (independent review done; MPI bug is optimisation-depen
 ## 1. MPI baseline
 - Why: the 172x compares one V100 with one serial Fortran core. Real LIS runs on many cores; a fair claim is "N times faster than N cores".
 - Plan: MPICH (GNU 14) -> ESMF with MPICH -> MPI copy of LIS -> run 5.0 CONUS, 5 days at several core counts on the same Xeon node type -> full 60 days at the best count -> report time and speed-up vs JAX.
-- Expect the headline ratio to fall. That is the point. It fell from 172x to 8.7x.
+- Expect the headline ratio to fall. That is the point. It fell from 172x to 12.1x (20 cores, verified output) and 8.7x (40 cores, output not clean).
 
 | Run (Noah-MP 5.0 CONUS, 60 d) | Hardware | Wall time | JAX speed-up |
 |---|---|---|---|

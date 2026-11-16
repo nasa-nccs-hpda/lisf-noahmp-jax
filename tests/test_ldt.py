@@ -5,7 +5,7 @@ import numpy as np, pytest
 import netCDF4 as nc
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-RUN = os.environ.get("LISF_RUN", "/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run")
+RUN = os.environ.get("LISF_RUN", "")
 CASES = [("ldt_mp", "lis_input.sgp.noahmp401.nc"), ("conus_mp", "lis_input.conus.noahmp401.nc")]
 
 

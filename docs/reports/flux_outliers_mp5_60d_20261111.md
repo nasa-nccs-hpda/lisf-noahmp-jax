@@ -56,3 +56,17 @@ Test 1, physics from Fortran state: cold-start Fortran dump of Feb 1 (job 379563
 Test 2, one-ulp sensitivity (existing pair `jaxout_fix1` vs `jaxout_fix1_ulp`, air temperature +1 float32 ulp, about 3e-5 K): JAX vs JAX+1ulp shows the same onset (1 cell > 1e-3 mm at 06Z, 2 at 12Z, 57 at 18Z Feb 1) and the same growth (179 cells at Feb 3 00Z against 223; from 12Z on the ulp run has 10 to 20% fewer cells than Fortran-vs-JAX). Fortran-vs-JAX and JAX-vs-ulp sets overlap strongly: Feb 1 18Z 42 cells common out of 57 and 65 (a random overlap would be 0.04 cells); Feb 3 18Z 248 common of 347 and 376 (random 1.3).
 
 Reading: the first divergence is the same size, time and place as a 3e-5 K perturbation of the input, so it is sensitivity of thin melting snow to float32 rounding, not a systematic difference. Not tested: why the 12Z count is already 2 for the ulp run and 0 for Fortran vs JAX (small numbers), and whether a float64 JAX run lands closer to Fortran.
+
+## Float64 check (2026-11-16)
+
+Question: is the thin-snow drift just float32 rounding? A scratch copy of `src` with every `jnp.float32`/`np.float32` switched to float64 (`JAX_ENABLE_X64=1`, V100, 2 min 20 s for 2 days; script `scripts/slurm/gpu_conus_mp5_f64_2d.sbatch`, output `conus_mp5_60d/jaxout_f64`, the repo code is unchanged) was run for 2017-02-01 00Z to 02-03 00Z and compared by `tools/compare/swe_divergence.py` (SWE_inst, cells with |diff| > 1e-3 mm).
+
+| Pair | Feb 1 06Z | 12Z | 18Z | Feb 2 18Z | Feb 3 00Z |
+|---|---|---|---|---|---|
+| Fortran vs JAX float32 | 0 | 0 | 65 | 224 | 223 |
+| Fortran vs JAX float64 | 0 | 1 | 74 | 229 | 227 |
+| JAX float32 vs JAX float64 | 0 | 1 | 72 | 229 | 225 |
+
+At 18Z on Feb 1 the three difference sets share most cells: 49 cells are in both Fortran-vs-float32 and Fortran-vs-float64, 58 in Fortran-vs-float64 and float32-vs-float64, 38 in all three (a random overlap would be 0.05).
+
+Reading: float64 JAX is **not closer to Fortran** than float32 JAX is (74 against 65 cells). Fortran, JAX float32 and JAX float64 each differ from the other two by the same amount, in the same thin-snow cells. So the drift is a property of those cells (a few mm of snow melting in a few steps amplifies any rounding-level difference, from either implementation), not a defect of the float32 port. It also shows float32 is not what makes JAX differ from Fortran, and that moving to float64 would not buy agreement with Fortran. Limits: 2 days only; SWE only; the float64 copy was not run through the test suite.

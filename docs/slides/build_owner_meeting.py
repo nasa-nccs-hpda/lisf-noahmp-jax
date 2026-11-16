@@ -67,23 +67,23 @@ def slides():
         mw = (W - 2 * MARGIN) / 4
         for i, (v, lab, det, col) in enumerate([
                 ("172x", "faster than 1 Fortran core", "CONUS, 60 days, Noah-MP 5.0: 43,900 s to 255 s on one V100", GREEN),
-                ("12.1x", "faster than 20-core MPI", "3,092 s, output verified identical. 8.7x vs 40 cores (output wrong in 2.7% of tiles)", GREEN),
+                ("12.1x", "faster than 20-core MPI", "3,092 s, output verified identical. 8.7x vs 40 cores (output diverges in 2.7% of tiles)", GREEN),
                 ("99%", "of tile-values at float32 noise", "CONUS p99: SWE 0.023 mm, soil T 0.021 K", GREEN),
-                ("480 / 480", "input files bitwise identical", "Weather read from GRIB equals the Fortran output, on R's case", GREEN)]):
+                ("480 / 480", "input files bitwise identical", "Weather read from GRIB equals the Fortran output, on the LIS developer's case", GREEN)]):
             _metric(p, MARGIN + i * mw, y + 4, mw - 8, 84, v, lab, det, col)
         cy = y + 98
         _cards(p, MARGIN, cy, CW, 206, "WHY IT SHOULD BE BELIEVED", [
-            "Real LIS 7.8 (our GNU build and R's Intel build), same inputs, compared tile by tile.",
+            "Real LIS 7.8 (our GNU build and the LIS developer's Intel build), same inputs, compared tile by tile.",
             "Flux limits were fixed before looking: p99 Qle 0.04, Qh 0.49, Qg 0.63 W/m2 against 5, 10, 5.",
-            "R's own case, unchanged but for dates: 76,180 tiles, 60 days, 480 files, against R's 60-rank Intel LIS. Typical tiles agree at rounding level on CPU and A100.",
+            "The developer's own case, unchanged but for dates: 76,180 tiles, 60 days, 480 files, against the developer's 60-rank Intel LIS. Typical tiles agree at rounding level on CPU and A100.",
             "Reruns pass elsewhere: tarball on Nexus, on Discover (CPU 49 tests, A100 example) and in GitHub CI.",
         ], GREEN, 10.4, 7)
         _cards(p, MARGIN + CW + GAP, cy, CW, 206, "WHY YOU SHOULD STAY SKEPTICAL", [
             "No expert review. Most checks were run by the assistant that wrote the code.",
-            "Worst single tiles differ far more than typical ones (R's case: SWE 7.5 mm, soil T 9 K) and are not yet examined there.",
+            "Worst single tiles differ far more than typical ones (the developer's case: SWE 7.5 mm, soil T 9 K) and are not yet examined there.",
             "Scope: Noah-MP, Noah, Mosaic, CLSM; two forcings. No LDT/LVT, VIC, CLM2, RUC, JULES.",
             "Seasons: Feb-Jul 2017, one SGP year, Oct-Nov 2008. 5.0 fluxes: CONUS Feb-Apr only.",
-            "Speed baselines are our own builds; R's Fortran wall time is unmeasured.",
+            "Speed baselines are our own builds; the developer's Fortran wall time is unmeasured.",
         ], ORANGE, 10.4, 7)
         banner(p, MARGIN, y + 312, W - 2 * MARGIN, 40, "What we ask: try to break it. The rest of this deck shows where to push.", AMBER, 11.5)
         footer(p, n, "Reports/BENCHMARKS.md; reports/discover_r_case_60d_20261110.md; flux_compare_mp5_60d_20261110.md; independent_test_20261105.md; tests/README.md")
@@ -93,11 +93,11 @@ def slides():
         p, y = _page("Agreement: two systems, two compilers, two GPU types",
                      "Differences from Fortran, tile by tile, all hourly or 3-hourly output. p99: 99% of values differ by less than this.", EYE, 24)
         cols = [210, 150, 150, 150, 150]
-        rows = [["JAX minus Fortran", "CONUS 60 d (V100)", "R's case, CPU p99", "R's case, A100 p99", "R's worst tile (CPU)"],
+        rows = [["JAX minus Fortran", "CONUS 60 d (V100)", "Dev. case, CPU p99", "Dev. case, A100 p99", "Dev. worst tile (CPU)"],
                 ["Snow water equivalent (mm)", "0.023", "0.0007", "0.0016", "7.5"],
                 ["Soil temperature (K)", "0.021", "0.0037", "0.0055", "9.0"],
                 ["Soil moisture (m3/m3)", "0.0001", "0.0000065", "0.000038", "0.052"],
-                ["Qle / Qh / Qg (W/m2)", "0.04 / 0.49 / 0.63", "not in R's output", "-", "-"]]
+                ["Qle / Qh / Qg (W/m2)", "0.04 / 0.49 / 0.63", "not in dev. output", "-", "-"]]
         sc = (W - 2 * MARGIN) / sum(cols)
         p.table(MARGIN, y + 4, [c * sc for c in cols], rows, size=10.5, maxh=130, bold_cols=(0,), pad=6)
         cy = y + 140
@@ -110,16 +110,16 @@ def slides():
         _cards(p, MARGIN + CW + GAP, cy, CW, 200, "OUR READING, AND ITS WEAK POINT", [
             "The snow state is sensitive to the last bit: an intrinsic property, not a port error.",
             "Weak point: we cannot prove the absence of a small physics difference inside that sensitivity.",
-            "R's worst tiles (SWE 7.5 mm, soil T 9 K) are not yet looked at; a reviewer with the Fortran will see them fastest.",
+            "The developer's worst tiles (SWE 7.5 mm, soil T 9 K) are not yet looked at; a reviewer with the Fortran will see them fastest.",
         ], BLUE, 10.2, 7)
         banner(p, MARGIN, y + 348, W - 2 * MARGIN, 34, "Typical tiles agree at rounding level on both systems. Rare snow tiles do not, and that is where to look.", AMBER, 10.8)
         footer(p, n, "reports/discover_r_case_60d_20261110.md; flux_compare_mp5_60d_20261110.md; flux_outliers_mp5_60d_20261111.md (first divergence, float64 check)")
         return p
 
     def s3(n):
-        p, y = _page("Speed: large on our case; not yet a fair race on R's",
-                     "Same simulation and output files in every pair. Wall time of the whole run, including compile and file reading for JAX.", EYE, 24)
-        lo, span, bx, bw = 2.0, 3.0, MARGIN + 190, 330
+        p, y = _page("Speed: large on our case; unmeasured on the developer's case",
+                     "Same simulation and output files in every pair. Whole-run wall time, JAX including compile and file reading. JAX 12x means JAX is 12x faster.", EYE, 24)
+        lo, span, bx, bw = 2.0, 3.0, MARGIN + 190, 290
 
         def bar(yy, lab, v, col, txt):
             p.text(MARGIN, yy + 1, 180, lab, 10.2, INK, True, maxh=16)
@@ -127,15 +127,15 @@ def slides():
             p.rect(bx, yy, w, 18, col, 2)
             p.text(bx + w + 8, yy + 3, 170, txt, 9.6, INK2, maxh=14)
         p.text(MARGIN, y + 2, 500, "CONUS, Noah-MP 5.0, 60 days, 0.125 deg (log scale)", 10.6, GREEN, True, maxh=16)
-        bar(y + 30, "Fortran, 1 core", 43900, ORANGE, "43,900 s (12 h)")
-        bar(y + 60, "Fortran, 20-core MPI", 3092, ORANGE, "3,092 s (52 min), output verified")
-        bar(y + 90, "Fortran, 40-core MPI", 2207, ORANGE, "2,207 s (37 min), output not clean")
-        bar(y + 120, "JAX, 1 V100", 255, GREEN, "255 s: 172x / 12.1x / 8.7x")
-        p.text(MARGIN, y + 150, 520, "Fortran = LIS 7.8, GNU 14.2, our build. 20-core output is bitwise identical to serial; the 40-core run is wrong in 2.7% of tiles (our build).", 9, MUTED, maxh=24)
-        _cards(p, MARGIN + 570, y + 4, W - 2 * MARGIN - 570, 160, "R'S CASE (DISCOVER)", [
+        bar(y + 30, "Fortran, 1 core", 43900, ORANGE, "43,900 s: JAX 172x")
+        bar(y + 60, "Fortran, 20-core MPI", 3092, ORANGE, "3,092 s (52 min): JAX 12.1x")
+        bar(y + 90, "Fortran, 40-core MPI", 2207, ORANGE, "2,207 s (37 min): JAX 8.7x; diverges")
+        bar(y + 120, "JAX, 1 V100", 255, GREEN, "255 s (one GPU)")
+        p.text(MARGIN, y + 150, 520, "Fortran LIS 7.8 runs on CPUs only; GNU 14.2, our build. 20-core output is bitwise identical to serial; the 40-core run diverges in 2.7% of tiles (see below).", 9, MUTED, maxh=24)
+        _cards(p, MARGIN + 570, y + 4, W - 2 * MARGIN - 570, 160, "DEVELOPER'S CASE (DISCOVER)", [
             "A100: 253 s = 113 s compile + 104 s GRIB read + 8.5 s model.",
             "16 CPU cores: 17 min 55 s.",
-            "Ratio to R's Fortran: unknown, its wall time was not measured.",
+            "Ratio to the developer's Fortran: unknown, its wall time was not measured.",
         ], BLUE, 10.2, 7)
         _cards(p, MARGIN, y + 182, CW, 118, "WHAT THIS DOES NOT SHOW", [
             "One run per configuration; no repeats, no variance.",
@@ -143,10 +143,10 @@ def slides():
             "Small cases gain less: 2.4x to 10x vs 1 core.",
         ], ORANGE, 10.2, 7)
         _cards(p, MARGIN + CW + GAP, y + 182, CW, 118, "OPEN FAULT, PROBABLY OURS", [
-            "Our GNU-built LIS gives different output at 32+ cores than at 20.",
-            "R's Intel LIS is bitwise identical at 20, 32 and 40 ranks, so the fault looks to be in our build or patches, not in LIS. Not yet isolated.",
+            "Our LIS 7.8, built with GNU (CPU, MPI), gives divergent output at 32+ cores: it differs from its own 20-core result, which it should not.",
+            "The developer's LIS 7.8, built with Intel on Discover, is bitwise identical at 20, 32 and 40 cores. Likely our build or patches; not yet isolated.",
         ], ORANGE, 10.2, 7)
-        banner(p, MARGIN, y + 312, W - 2 * MARGIN, 34, "A fair claim needs R's Fortran wall time on R's case. That is ask 2.", AMBER, 11)
+        banner(p, MARGIN, y + 312, W - 2 * MARGIN, 34, "A fair claim needs the Fortran wall time on the developer's own case. That is ask 2.", AMBER, 11)
         footer(p, n, "Reports/BENCHMARKS.md; reports/discover_r_case_60d_20261110.md")
         return p
 
@@ -155,9 +155,9 @@ def slides():
                      "One tarball with code, run scripts and every check. We need reviewers and decisions; we are not asking you to adopt it.", EYE, 24)
         rows = [
             ("1 REVIEW", "Read src/.../physics/noahmp50_jax.py against your Fortran; name what looks wrong or missing.", "Noah-MP scientist, 1-2 days"),
-            ("2 TIME", "Wall time of R's Fortran 60-day run, to make the speed claim fair.", "R, one number"),
+            ("2 TIME", "Wall time of the developer's Fortran 60-day run, to make the speed claim fair.", "LIS developer, one number"),
             ("3 REFERENCE", "A summer or other-region case, and the tolerances you accept.", "Owner and data contact"),
-            ("4 REPRODUCE", "Run examples/sgp_5d (about 1 minute on CPU, Fortran output included, environment pinned by uv.lock), or R's case. Tell us where our numbers break.", "Engineer, GPU optional"),
+            ("4 REPRODUCE", "Run examples/sgp_5d (about 1 minute on CPU, Fortran output included, environment pinned by uv.lock), or the developer's case. Tell us where our numbers break.", "Engineer, GPU optional"),
             ("5 DECIDE", "Which models and domains first; speed or differentiable/ML use; a named maintainer.", "Owner, one meeting"),
         ]
         yy = y + 4

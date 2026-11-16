@@ -10,7 +10,7 @@ JAX ports of land surface models from NASA's Land Information System Framework (
 - Agreement (same run): p99 of JAX-minus-Fortran SWE 0.023 mm, soil temperature 0.021 K; single-tile maxima are larger (snow/freeze-thaw thresholds).
 
 ## Run
-The validated environment is Python 3.10 with JAX 0.5.3, numpy and netCDF4 (the `graphcast-env` conda environment on the NCCS cluster). Try it first: `examples/sgp_5d/README.md` (a 5-day case that runs in about a minute without `/panfs`, with the Fortran reference). Reproducible install: `uv sync --locked --extra test` (uses `uv.lock`; add `--extra gpu` for CUDA), then `uv run lisf-noahmp-jax -C CASE_DIR CASE_DIR/lis.config.jax`. With pip: `pip install ".[test]"` then `lisf-noahmp-jax -C CASE_DIR CASE_DIR/lis.config.jax`. or `PYTHONPATH=src`.
+The validated environment is Python 3.10 with JAX 0.5.3, numpy and netCDF4 (the `graphcast-env` conda environment on the Nexus cluster). Try it first: `examples/sgp_5d/README.md` (a 5-day case that runs in about a minute without `/panfs`, with the Fortran reference). Reproducible install: `uv sync --locked --extra test` (uses `uv.lock`; add `--extra gpu` for CUDA), then `uv run lisf-noahmp-jax -C CASE_DIR CASE_DIR/lis.config.jax`. With pip: `pip install ".[test]"` then `lisf-noahmp-jax -C CASE_DIR CASE_DIR/lis.config.jax`. or `PYTHONPATH=src`.
 
 ```bash
 PYTHONPATH=src python -m lisf_noahmp_jax.cli -C CASE_DIR CASE_DIR/lis.config.jax     # run from a LIS-style config; add --hours 1 to write hourly history files (default 6, the config's output interval is ignored)

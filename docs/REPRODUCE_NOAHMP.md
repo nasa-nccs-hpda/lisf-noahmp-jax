@@ -9,7 +9,7 @@ Purpose: let someone other than the author check one claim end to end: **Noah-MP
 | This repository (`lisf-noahmp-jax/`) | `projects/LISF/lisf-noahmp-jax` |
 | Case directory `$LISF_RUN` with `INPUT/` (NLDAS-2 netcdf 2017, parameter tables), `ldt_mp/` (LDT config + output), `LIS_mp_clean` (Fortran LIS, GNU 14.2 serial, Noah-MP built in) | `/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run` |
 | Fortran runtime environment | `source /panfs/ccds02/nobackup/people/gtamkin/dev/lisf_deps/env_lis.sh` |
-| Python with JAX 0.5.3 (conda env `graphcast-env`); on a GPU node `--constraint=v100 --gres=gpu:1`; CPU also works (`JAX_PLATFORMS=cpu`, slower) | NCCS conda module, see `Reports/ENVIRONMENT.md` |
+| Python with JAX 0.5.3 (conda env `graphcast-env`); on a GPU node `--constraint=v100 --gres=gpu:1`; CPU also works (`JAX_PLATFORMS=cpu`, slower) | Nexus conda module, see `Reports/ENVIRONMENT.md` |
 | Raw LDT inputs (only for step 1) | `$LISF_RUN/ldt_mp/INPUT/LS_PARAMETERS` |
 
 Anything that is not under these paths has not been tested; the code contains some absolute paths of the author (see `DATA_AND_PATHS.md`).

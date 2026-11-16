@@ -32,7 +32,7 @@ def slides():
             "Real LIS 7.8 (our GNU build and R's Intel build), same inputs, compared tile by tile.",
             "Flux limits were fixed before looking: p99 Qle 0.04, Qh 0.49, Qg 0.63 W/m2 against 5, 10, 5.",
             "R's own case, unchanged but for dates: 76,180 tiles, 60 days, 480 files, against R's 60-rank Intel LIS. Typical tiles agree at rounding level on CPU and A100.",
-            "Reruns pass elsewhere: tarball on NCCS, on Discover (CPU 49 tests, A100 example) and in GitHub CI.",
+            "Reruns pass elsewhere: tarball on Nexus, on Discover (CPU 49 tests, A100 example) and in GitHub CI.",
         ], GREEN, 10.4, 7)
         _cards(p, MARGIN + CW + GAP, cy, CW, 206, "WHY YOU SHOULD STAY SKEPTICAL", [
             "No expert review. Most checks were run by the assistant that wrote the code.",

@@ -8,7 +8,7 @@ Owner: G. Tamkin. Written by a Claude Code session from the paths used in the ru
 |---|---|---|
 | `LISF_RUN` | case directories (`conus_clsm1d`, `conus_hy`, `conus_mp7`, ...), input links, NLDAS-2 forcing, LDT outputs, and the Fortran binaries `LIS_clsm_dump2`, `LIS_mp_hy` | `/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_run` (`jax-port/run` is a symlink) |
 | `LISF_ENV` | script that sets up GNU 14.2 and the libraries (ESMF mpiuni, NetCDF, HDF) for running the Fortran binaries | `/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_deps/env_lis.sh` |
-| `CONDA_BIN`, `JAX_ENV` | conda executable and the JAX environment (`graphcast-env`: jax 0.5.3, Python 3.10) | conda from the NCCS module: `/panfs/ccds02/app/modules/anaconda/platform/x86_64/rhel/8.6/3-2022.05/bin/conda` |
+| `CONDA_BIN`, `JAX_ENV` | conda executable and the JAX environment (`graphcast-env`: jax 0.5.3, Python 3.10) | conda from the Nexus module: `/panfs/ccds02/app/modules/anaconda/platform/x86_64/rhel/8.6/3-2022.05/bin/conda` |
 | (not read by the runner) build copy of LIS and LDT with patches and dump hooks | `/panfs/ccds02/nobackup/people/gtamkin/dev/lisf_build/{lis,ldt}`; rebuild with `lis_patches/env_lis.sh` and `make` in `lis/make`; restore the hooks with `\cp -f` from the repo before rebuilding |
 | public LIS data | parameters (`PARAMETERS/clsm25_parms`, `HYMAP_parms/NLDAS_12.5KM`, `mos_parms`, `VIC`, ...) | `/css/lisdata-pub/data` |
 
@@ -23,6 +23,6 @@ Built-in knowledge for each case: CLSM needs `conus_clsm/out/lis_input.conus.cls
 
 ## 3. Cluster facts the runner assumes
 
-* NCCS ADAPT: partition `compute`, `--constraint=v100`, Tesla V100 nodes (gpu011, gpu012 seen); the login host has no SLURM client, so submit with `SBATCH_HOST=gpulogin1` (ssh).
+* Nexus ADAPT: partition `compute`, `--constraint=v100`, Tesla V100 nodes (gpu011, gpu012 seen); the login host has no SLURM client, so submit with `SBATCH_HOST=gpulogin1` (ssh).
 * Timing pairs need exclusive nodes (the runner asks for them). Node types seen: gpu012 Xeon Gold 6248. Fortran time on a login node is slower than on a compute node; compare only same-node pairs.
 * Do not use `pkill -f` with a pattern that matches your own shell; `rm -rf` on globs may be blocked.

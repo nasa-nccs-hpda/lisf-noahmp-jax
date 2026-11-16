@@ -1,4 +1,4 @@
-# Running the independent test on Discover (NCCS)
+# Running the independent test on Discover (Nexus)
 
 Status: NOT RUN. Blocked 2026-11-05: no authenticated SSH session from the work machine to `login.nccs.nasa.gov` (publickey / keyboard-interactive needs a person).
 

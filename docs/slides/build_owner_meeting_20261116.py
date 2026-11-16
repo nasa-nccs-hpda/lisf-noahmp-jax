@@ -28,7 +28,7 @@ def slides():
         _cards(p, MARGIN + cw + gap, y + 6, cw, 296, "WHAT IT IS NOT", [
             "Not the full LIS: no LDT/LVT, only two forcings, no VIC, CLM2, RUC or JULES.",
             "Not yet reviewed by a person who knows LIS or Noah-MP. A simulated independent tester rated it acceptable for the named cases, with conditions. Most checks were run by the assistant that wrote the code.",
-            "Seasons: Feb-Jul 2017, one SGP year and Oct-Nov 2008 (R's case). 5.0 fluxes are compared on CONUS Feb-Apr only, not on R's case or in summer. GitHub CI passes.",
+            "Seasons: Feb-Jul 2017, one SGP year and Oct-Nov 2008 (R's case). 5.0 fluxes are compared on CONUS Feb-Apr only, not on R's case or in summer. GitHub CI passes; the tarball also passed on Discover (CPU: 49 tests; A100: example).",
             "148 CONUS water-soil tiles (soil type 14) go unstable in warm season in BOTH Fortran and JAX: an input-data issue, masked.",
             "Fair speed claim is 12.1x (vs 20 MPI cores, output verified identical); 172x is vs one core. MPI at 32+ ranks gives wrong output in our GNU build only: R's Intel-built LIS is bitwise identical at 20, 32 and 40 ranks, so the fault is in our build or patches, not LIS. Culprit not yet isolated.",
         ], ORANGE, 9.6, 6)

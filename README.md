@@ -35,4 +35,4 @@ Environment variables: `JAX_PLATFORMS=cpu` (force CPU), `LISJAX_FORCING_PROCS` (
 ## Upstream references
 LISF: github.com/NASA-LIS/LISF (reference clone at commit 95ae9791a). Noah-MP physics: github.com/NCAR/noahmp, pinned by LISF as a submodule at 0cd33858 (Apr 2024); a 5.2.1 update is planned (separate plan in docs). Origin of this code: the `jax-port` repository (history frozen at its last commit; moved here without rewriting history).
 
-See [AGENTS.md](AGENTS.md) and [CONTRIBUTING.md](CONTRIBUTING.md) for working rules. The Apache-2.0 license is the template's; the license for code derived from NCAR Noah-MP is an open question (docs/project-brief.md).
+See [AGENTS.md](AGENTS.md) and [CONTRIBUTING.md](CONTRIBUTING.md) for working rules. Licence: Apache-2.0 (LICENSE) for the project's own code; the Noah-MP translation is also under the UCAR Noah-MP agreement (licenses/UCAR-Noah-MP-LICENSE.txt: no sale, keep the notice); see NOTICE.

@@ -23,3 +23,5 @@ The builder raises if a text block does not fit its box. Only WinAnsi characters
 - `owner_meeting_20261110.pdf` (builder `build_owner_meeting_20261110.py`): revision of the 2026-11-02 owner-meeting slides with the independent review, the snow test, R's case on Discover (60-day CPU and A100 results) and the narrowed MPI finding. The 2026-11-02 deck stays as presented.
 
 - `build_owner_meeting_20261111.py` -> `owner_meeting_20261111.pdf` (2026-11-11): the 20261110 deck with the 5.0 flux comparison and outlier replays, the closed test gap, the example case and uv.lock added; slide 2 unchanged apart from the date. Older decks untouched.
+
+- `build_owner_meeting_20261116.py` -> `owner_meeting_20261116.pdf` (2026-11-16): the 20261111 deck with the first-divergence finding (thin melting snow, same drift under a 3e-5 K nudge), CI passing, and delivery by tarball under Apache-2.0 plus the UCAR Noah-MP terms (NOTICE). Slide 2 unchanged apart from the date.

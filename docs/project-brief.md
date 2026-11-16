@@ -11,7 +11,7 @@ Status: Partly configured (2026-11-03). Fields marked Unresolved are unknown, no
 | Receiving technical maintainer | Unresolved |
 | Repository owner and visibility | Unresolved |
 | Support and security reporting contact | Unresolved |
-| License and attribution requirements | OPEN: template Apache-2.0; NCAR/noahmp uses a UCAR license and LISF is Apache-2.0; ported physics may need attribution. Decide before sharing outside the team |
+| License and attribution requirements | DECIDED 2026-11-16: keep the Apache-2.0 template for the project's own code; Noah-MP-derived files also carry the UCAR agreement (licenses/UCAR-Noah-MP-LICENSE.txt, no sale, notice kept) and are credited in NOTICE |
 | Runtime / stack and rationale | Python 3.10 + JAX 0.5.3 (validated); Fortran LIS GNU 14 as reference |
 | Hosting account, platform, region, and billing owner | Unresolved |
 | Data classification, storage, retention, and access | Unresolved |

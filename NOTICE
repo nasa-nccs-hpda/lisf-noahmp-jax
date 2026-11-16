@@ -1,0 +1,21 @@
+lisf-noahmp-jax: a JAX port of land surface models from NASA LISF, validated against LISF.
+
+Licence: Apache License 2.0 (LICENSE) for the code written for this project.
+
+Noah-MP (src/lisf_noahmp_jax/physics/noahmp*_jax.py and the Noah-MP parts of the driver and tests) is a translation of the NCAR Noah-MP
+software and is also subject to the UCAR Noah-MP agreement in licenses/UCAR-Noah-MP-LICENSE.txt, which includes: no sale of the software or
+of any work containing it, and no use of the UCAR/NCAR names to endorse or promote products. The agreement and the notice below must travel
+with every copy.
+
+  "The source of this material is the Research Applications Laboratory at the National Center for Atmospheric Research, a program of the
+  University Corporation for Atmospheric Research (UCAR) pursuant to a Cooperative Agreement with the National Science Foundation;
+  (c)2007 University Corporation for Atmospheric Research. All Rights Reserved."
+
+Any scholarly work associated with, related to or derived from this software must state:
+
+  "The Noah-MP modeling system was developed at the National Center for Atmospheric Research (NCAR) with collaborations from university
+  partners. NCAR is sponsored by the United States National Science Foundation."
+
+The other ported models (Noah 3.x, Mosaic, CLSM) and the Fortran reference outputs come from NASA LISF (github.com/NASA-LIS/LISF, Apache-2.0),
+Land Information System, NASA Goddard Space Flight Center. examples/sgp_5d contains cropped NLDAS-2 forcing (NASA GES DISC) and the
+Noah-MP parameter table NoahmpTable.TBL (NCAR Noah-MP, UCAR terms above).
